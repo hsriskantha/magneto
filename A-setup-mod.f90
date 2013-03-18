@@ -87,7 +87,7 @@ module setup
 
   ! Defining time and space.
   ! ------------------------
-      ! Note: the values of these variables can be set in C-tests-mod.f90. 
+      ! Note: the values of these variables can be set in the <TESxx> subroutines.
 
   real (PREC) :: DELTAT, FULLTIME        ! dt, total required time
   real (PREC) :: MAX_DELTAT, COURANT     ! maximum possible dt, Courant number

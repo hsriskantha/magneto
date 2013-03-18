@@ -48,3 +48,62 @@ FUNCTIONS AND SUBROUTINES
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
+
+
+B: The Fluid Module
+===================
+-- Main variables: the 3D fluid and magnetic field variables.
+-- Main actions: EOS calculations; determine fluid properties; output data to file.
+
+
+GUIDES
+------
+
+- [FLU_A]: Output Data - Version A
+
+
+FUNCTIONS AND SUBROUTINES
+-------------------------
+
+- [FLU01]: subroutine Initialise_fluid ()
+           Initalise Fluid
+
+- [FLU02]: function Calculate_energy_EOS (dens_val, pres_val, gamma_val, velc_squrd, magf_squrd)
+           Calculate the Energy using an Ideal Equation of State
+
+- [FLU03]: function Calculate_pressure_EOS (dens_val, ergy_val, gamma_val, velc_squrd, magf_squrd)
+           Calculate the Pressure using an Ideal Equation of State
+
+- [FLU04]: function Calculate_total_pressure (thermal_pressure, magf_squrd)
+           Calculate Total Pressure
+
+- [FLU05]: function Calculate_gas_pressure (total_pressure, magf_squrd)
+           Calculate Gas Pressure (from total pressure)
+
+- [FLU06]: function MHDF (power)
+           Determine MHD Factor (depending on units used)
+
+- [FLU07]: subroutine Determine_timestep ()
+           Determine the Timestep (using CFL condition)
+
+- [FLU08]: subroutine Output_data_A (i, j, k, num)
+           Output Data
+             >> Version A: 1D Output (density; pressure; y-velocity; y-magnetic field)
+
+- [FLU09]: subroutine Output_data_B (num)
+           Output Data
+             >> Version B: 2D Output (density; thermal pressure; magnetic pressure; velocity squared)
+
+- [FLU10]: subroutine Output_data_C (num)
+           Output Data
+             >> Version C: Mixed Output (magnetic field components: z- in 2D; transverse in 1D)
+
+- [FLU11]: subroutine Save_restart_files ()
+           Save Restart Files
+
+- [FLU12]: subroutine Deallocate_fluid ()
+           Deallocate the Fluid
+
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
