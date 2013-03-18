@@ -1,0 +1,50 @@
+! ----------------------------------------------------------------------------------------------------------------------------------
+! --- Quarkwood Magneto 8.0 --------------------------------------------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------------------
+! --- Table of Contents ------------------------------------------------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------------------
+! --- This file is best viewed with a window at least 135 characters wide. ---------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+
+  NOTE: each subroutine/function has a five character keycode. 
+    The first three characters (letters) indicate the module name.
+    The last two characters (numbers) indicate the position within the code file.
+  For example: [FLU01] is the first subroutine in the fluid module (B-fluid-mod.f90). 
+
+  Once a file is open, you can quickly jump to a subroutine/module by searching for the
+  keycode within square brackets, for example "[FLU01]".
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+
+A: The Setup Module
+===================
+-- Contains initial settings and some basic functions.
+
+
+GUIDES
+------
+
+- [SET_A]: Settings and Initial Conditions
+- [SET_B]: Boundary Conditions
+- [SET_C]: Magnetohydrodynamics Units
+
+
+
+FUNCTIONS AND SUBROUTINES
+-------------------------
+
+- [SET01]: function Dotproduct (a, b)
+           Calculate the Dot Product
+
+- [SET02]: function Create_vector (a, b, c)
+           Create Vector (from three scalar values)
+
+- [SET03]: function Create_vector7 (a, b, c, d, e, f, g)
+           Create Vector (from seven scalar values)
+
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
