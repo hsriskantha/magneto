@@ -107,3 +107,51 @@ FUNCTIONS AND SUBROUTINES
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
+
+
+C: The Tests Module
+===================
+-- Main actions: define initial conditions. 
+
+
+GUIDES
+------
+
+- [TES_A]: More Test Cases...
+
+
+
+FUNCTIONS AND SUBROUTINES
+-------------------------
+
+- [TES01]: subroutine Set_initial_conditions_A ()
+           Set Initial Conditions of Fluid
+             >> Version A: Sod's 1D Shock Tube Test (magnetic)
+
+- [TES02]: subroutine Set_initial_conditions_B ()
+           Set Initial Conditions of Fluid
+             >> Version B: Circularly Polarised Alfven Waves
+
+- [TES03]: subroutine Set_initial_conditions_C ()
+           Set Initial Conditions of Fluid
+             >> Version C: The Blast Problem 
+
+- [TES04]: subroutine Set_initial_conditions_D ()
+           Set Initial Conditions of Fluid
+             >> Version D: The Orszag-Tang Vortex
+
+- [TES05]: subroutine Set_initial_conditions_E ()
+           Set Initial Conditions of Fluid
+             >> Version E: The MHD Rotor Problem
+
+- [TES06]: subroutine Set_initial_conditions_F ()
+           Set Initial Conditions of Fluid
+             >> Version F: The Kelvin-Helmholtz Instability
+
+- [TES07]: subroutine Load_restart_file ()
+           Load a Restart File
+
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
+

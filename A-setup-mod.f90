@@ -39,12 +39,11 @@ module setup
   !     TEST_PROBLEM :: This setting determines the initial conditions. The options are:
   !     ------------
   !       = 'A' - Sod's 1D Shock Tube Test (magnetic)
-  !       = 'B' - The Blast Problem (Version 1)
-  !       = 'C' - The Kelvin-Helmholtz Instability
+  !       = 'B' - Circularly Polarised Alfven Waves
+  !       = 'C' - The Blast Problem
   !       = 'D' - The Orszag-Tang Vortex
-  !       = 'E' - Circularly Polarised Alfven Waves
-  !       = 'F' - The MHD Rotor Problem
-  !       = 'G' - The Blast Problem (Version 2)
+  !       = 'E' - The MHD Rotor Problem
+  !       = 'F' - The Kelvin-Helmholtz Instability
   !       = 'X' - Load data from restart file
   !     Alternatively, you can create your own subroutine in C-tests-mod.f90, using the existing ones as templates
   !     (and make sure to update the code in G-evolve-mod and H-error-mod so the program recognises any new options...)
