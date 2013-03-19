@@ -155,3 +155,49 @@ FUNCTIONS AND SUBROUTINES
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
+
+D: The Grids Module
+===================
+-- Main variables: 1D row versions of the fluid and magnetic field variables.
+-- Main actions: extract 1D row from 3D grid; return 1D row to 3D grid.
+
+
+FUNCTIONS AND SUBROUTINES
+-------------------------
+
+- [GRI01]: subroutine Initialise_grids ()
+           Initialise the Grids
+
+- [GRI02]: subroutine Clear_1D_data ()
+           Clear the 1D Data
+
+- [GRI03]: subroutine Initialise_magnetic_field_arrays ()
+           Initialise the Magnetic Field Arrays
+
+- [GRI04]: subroutine Extract_row_x (j_fixed, k_fixed)
+           Extract Row from the x-Direction
+
+- [GRI05]: subroutine Extract_row_y (i_fixed, k_fixed)
+           Extract Row from the y-Direction
+
+- [GRI06]: subroutine Extract_row_z (i_fixed, j_fixed)
+           Extract Row from the z-Direction
+
+- [GRI07]: subroutine Add_boundaries (quant)
+           Add Boundaries
+
+- [GRI08]: subroutine Return_row_x (j_fixed, k_fixed)
+           Return Row from the x-Direction
+
+- [GRI09]: subroutine Return_row_y (i_fixed, k_fixed)
+           Return Row from the y-Direction
+
+- [GRI10]: subroutine Return_row_z (i_fixed, j_fixed)
+           Return Row from the z-Direction
+
+- [GRI11]: subroutine Deallocate_grids ()
+           Deallocate the Grids
+
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
