@@ -201,3 +201,39 @@ FUNCTIONS AND SUBROUTINES
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
+
+
+E: The Reconstruction Module
+============================
+-- Main variables: the left and right Riemann input states for the state variables.
+-- Main actions: determine these input states.
+
+
+GUIDES
+------
+
+- [REC_A]: Cell-centred vs Face-Centred Values
+
+
+
+FUNCTIONS AND SUBROUTINES
+-------------------------
+
+- [REC01]: subroutine Initialise_input_states ()
+           Initialise the Riemann Problem Input States
+
+- [REC02]: subroutine Determine_Riemann_input_TVD ()
+           Determine the Input States for the Riemann Problem (using balsara's TVD Scheme)
+
+- [REC03]: function minmod (x, y)
+           General Minmod Function
+
+- [REC04]: subroutine Calculate_eigensystem ()
+           Calculate the Eigen-system
+
+- [REC05]: subroutine Deallocate_input_states ()
+           Deallocate the Input States
+
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
