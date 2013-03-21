@@ -20,9 +20,9 @@ module setup
   ! Settings and initial conditions.
   ! --------------------------------
 
-  character, parameter :: TEST_PROBLEM     = 'A'
+  character, parameter :: TEST_PROBLEM     = 'E'
   character, parameter :: RECONSTRUCT_TYPE = 'T'
-  character, parameter :: OUTPUT_TYPE      = 'A'
+  character, parameter :: OUTPUT_TYPE      = 'B'
 
   logical, parameter :: VARIABLE_DELTAT  = .false.
   logical, parameter :: PRINT_DELTAT     = .true.

@@ -5,22 +5,30 @@
 # ----------------------------------------------------------------------------------------------------------------------------------
 
 
+
+# COMPILER OPTIONS
+# ----------------
+
 # GDB with traps for floating point exceptions
-# FFLAGS = -g -ffpe-trap=invalid,overflow -fbounds-check
+# OPTS = -g -ffpe-trap=invalid,overflow -fbounds-check
 
 # GDB
-# FFLAGS = -g
+# OPTS = -g
 
 # GDB with profiling
-# FFLAGS = -g -pg
+# OPTS = -g -pg
 
 # Optimised
-  FFLAGS = -O3
+  OPTS = -O3
+
 
 
 # ----------------------------------------------------------------------------------------------------------------------------------
 
-OBJS = ./objects/
+OBJS 	= ./objects/
+FFLAGS 	= -I$(OBJS) -J$(OBJS)
+
+
 
 MAGNETO:	$(OBJS)A.o  $(OBJS)B.o  $(OBJS)C.o  $(OBJS)D.o	\
                 $(OBJS)E.o  $(OBJS)F.o  $(OBJS)G.o  $(OBJS)H.o	\
@@ -31,7 +39,7 @@ MAGNETO:	$(OBJS)A.o  $(OBJS)B.o  $(OBJS)C.o  $(OBJS)D.o	\
 		$(OBJS)E.o  $(OBJS)F.o  $(OBJS)G.o  $(OBJS)H.o	\
 		magneto.f90
 
-		rm *.mod
+
 
 $(OBJS)H.o:	H-error-mod.f90 $(OBJS)A.o
 		gfortran $(FFLAGS) -c -o $(OBJS)H.o		\
@@ -70,5 +78,9 @@ $(OBJS)A.o:	A-setup-mod.f90
 		A-setup-mod.f90
 
 
+
 clean:
-		rm *.mod *~
+		rm -f *~
+
+fullclean:
+		rm -f *~ $(OBJS)* MAGNETO ./output/*

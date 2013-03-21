@@ -218,8 +218,8 @@ contains
     DIMENSIONS = 2
     BOUNDARY   = 2
 
-    XSIZE = 24     
-    YSIZE = 24    
+    XSIZE = 32     
+    YSIZE = 32    
     ZSIZE = 1       
 
     XDOMN = 1.0D0 / cos(alpha)
