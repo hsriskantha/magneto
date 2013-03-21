@@ -266,3 +266,52 @@ FUNCTIONS AND SUBROUTINES
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
+
+
+G: The Evolve Module
+====================
+- Main actions: evolve the entire grid for one timestep; evolve individual rows.
+
+
+FUNCTIONS AND SUBROUTINES
+-------------------------
+
+- [EVO01]: subroutine Initialise_simulation ()
+           Initialise the Simulation
+
+- [EVO02]: subroutine Evolve_grid ()
+           Evolve the Grid
+
+- [EVO03]: subroutine Evolve_x_direction ()
+           Evolve the x-Direction
+
+- [EVO04]: subroutine Evolve_y_direction ()
+           Evolve the y-Direction
+
+- [EVO05]: subroutine Evolve_z_direction ()
+           Evolve the z-Direction
+
+- [EVO06]: subroutine Evolve_row ()
+           Evolve the Row
+
+- [EVO07]: subroutine Finish_magnetic_field_evolution ()
+           Finishing the Magnetic Field Evolution
+
+- [EVO08]: subroutine Shut_down_simulation ()
+           Shut Down the Simulation 
+
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+
+H : The Error Module
+====================
+- Main actions: stop program for some errors.
+
+
+FUNCTIONS AND SUBROUTINES
+-------------------------
+
+- [ERR01]: subroutine Check_initial_errors ()
+           Check for Initial Errors
