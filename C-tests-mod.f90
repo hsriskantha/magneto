@@ -218,8 +218,8 @@ contains
     DIMENSIONS = 2
     BOUNDARY   = 2
 
-    XSIZE = 32     
-    YSIZE = 32    
+    XSIZE = 24     
+    YSIZE = 24    
     ZSIZE = 1    
 
     alpha = PI / 6.0D0   
@@ -257,10 +257,10 @@ contains
     do j = 1, YSIZE
        do i = 1, XSIZE
 
-          x = real(i) * DELTAX
-          y = real(j) * DELTAY
+          x = (real(i) - 0.5D0) * DELTAX
+          y = (real(j) - 0.5D0) * DELTAY
 
-          v_prll(i, j) = 0.0D0
+          v_prll(i, j) = 1.0D0
           v_perp(i, j) = 0.1 * sin(2.0D0 * PI * (x * cos(alpha) + y * sin(alpha)))
           B_prll(i, j) = 1.0D0
           B_perp(i, j) = v_perp(i, j)
