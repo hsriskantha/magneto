@@ -237,3 +237,32 @@ FUNCTIONS AND SUBROUTINES
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
+
+
+F: The Riemann Solver Module
+============================
+-- Main variables: the inter-cell flxues for the state variables.
+-- Main actions: determine these inter-cell fluxes.
+
+
+FUNCTIONS AND SUBROUTINES
+-------------------------
+
+- [SOL01]: subroutine Initialise_solver ()
+           Initialise the Solver
+
+- [SOL02]: subroutine Calculate_intercell_fluxes_HLLD ()
+           Calculating the Inter-cell Fluxes (HLLD Edition)
+
+- [SOL03]: function roeavg (rhoL, rhoR, varL, varR)
+           Calculating the Roe Averages
+
+- [SOL04]: function HLL_State (SL, SR, FL, FR, UL, UR)
+           Calculating the HLL State
+
+- [SOL05]: subroutine Deallocate_solver ()
+           Deallocate the Solver
+  
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
