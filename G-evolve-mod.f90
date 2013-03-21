@@ -131,7 +131,7 @@ contains
 
     if (DIMENSIONS > 1) then
 
-       call Clear_delta_b_arrays ()
+       call Initialise_magnetic_field_arrays ()
 
        call Evolve_z_direction ()
        call Evolve_y_direction ()

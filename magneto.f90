@@ -161,7 +161,7 @@ program magneto
   ! -------------------------
 
   BASE_FILE_NO = file_no
-  call Save_restart_file ()        ! --> <FLU11>
+  call Save_restart_files ()       ! --> <FLU11>
   call Shut_down_simulation ()     ! --> <EVO08>
           
   return

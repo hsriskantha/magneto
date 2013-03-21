@@ -21,27 +21,27 @@
 # ----------------------------------------------------------------------------------------------------------------------------------
 
 
-MAGNETO:	A_setup_mod.f90		\
-		B_fluid_mod.f90		\
-		C_tests_mod.f90		\
-		D_grids_mod.f90		\
-		E_recon_mod.f90		\
-		F_solve_mod.f90		\
-		G_evolve_mod.f90	\
-		H_error_mod.f90		\
-		main.f90
+MAGNETO:	A-setup-mod.f90		\
+		B-fluid-mod.f90		\
+		C-tests-mod.f90		\
+		D-grids-mod.f90		\
+		E-recon-mod.f90		\
+		F-solve-mod.f90		\
+		G-evolve-mod.f90	\
+		H-error-mod.f90		\
+		magneto.f90
 
 		gfortran -o MAGNETO 	\
 		$(FFLAGS)		\
-		A_setup_mod.f90		\
-		B_fluid_mod.f90		\
-		C_tests_mod.f90		\
-		D_grids_mod.f90		\
-		E_recon_mod.f90		\
-		F_solve_mod.f90		\
-		G_evolve_mod.f90	\
-		H_error_mod.f90		\
-		main.f90
+		A-setup-mod.f90		\
+		B-fluid-mod.f90		\
+		C-tests-mod.f90		\
+		D-grids-mod.f90		\
+		E-recon-mod.f90		\
+		F-solve-mod.f90		\
+		G-evolve-mod.f90	\
+		H-error-mod.f90		\
+		magneto.f90
 
 		rm *.mod
 

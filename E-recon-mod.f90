@@ -897,22 +897,6 @@ contains
 
     end if
 
-
-    ! Specific for PPM
-
-    if (RECONSTRUCT_TYPE == 'P') then
-
-       deallocate (wh)
-
-       deallocate (dwL);   deallocate (dwR);   deallocate (dwC);   deallocate (dwG)
-       deallocate (daL);   deallocate (daR);   deallocate (daC);   deallocate (daG)
-       
-       deallocate (PPM_dw)   
-       deallocate (PPM_w6)
-       deallocate (delta_a)  
-
-    end if
-
     return
 
 
