@@ -83,4 +83,4 @@ clean:
 		rm -f *~
 
 fullclean:
-		rm -f *~ $(OBJS)* MAGNETO ./output/*
+		rm -f *~ $(OBJS)* ./output/* MAGNETO

@@ -212,23 +212,23 @@ contains
     DELTAT   = 0.0001D0                  
     FULLTIME = 1.0D0        
 
-    COURANT    = 0.4D0
-    MAX_DELTAT = 0.0005D0    
+    COURANT    = 0.25D0
+    MAX_DELTAT = 0.01D0    
   
     DIMENSIONS = 2
     BOUNDARY   = 2
 
     XSIZE = 32     
     YSIZE = 32    
-    ZSIZE = 1       
+    ZSIZE = 1    
+
+    alpha = PI / 6.0D0   
 
     XDOMN = 1.0D0 / cos(alpha)
     YDOMN = 1.0D0 / sin(alpha)           
     ZDOMN = 1.0D0 * (real(ZSIZE) / real(XSIZE))
 
     MHDUNITS = 1     ! see <SET_C>
-
-    alpha = PI / 6.0D0
 
 
 

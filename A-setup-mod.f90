@@ -20,11 +20,11 @@ module setup
   ! Settings and initial conditions.
   ! --------------------------------
 
-  character, parameter :: TEST_PROBLEM     = 'E'
+  character, parameter :: TEST_PROBLEM     = 'B'
   character, parameter :: RECONSTRUCT_TYPE = 'T'
-  character, parameter :: OUTPUT_TYPE      = 'B'
+  character, parameter :: OUTPUT_TYPE      = 'C'
 
-  logical, parameter :: VARIABLE_DELTAT  = .false.
+  logical, parameter :: VARIABLE_DELTAT  = .true.
   logical, parameter :: PRINT_DELTAT     = .true.
   logical, parameter :: MAG_WAVESPEED    = .true.
   logical, parameter :: PRESSURE_FIX     = .false.
