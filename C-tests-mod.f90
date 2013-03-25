@@ -57,8 +57,8 @@ contains
     DELTAT   = 0.0001D0
     FULLTIME = 0.1D0
 
-    COURANT    = 0.4D0
-    MAX_DELTAT = 0.001D0
+    COURANT    = 0.25D0
+    MAX_DELTAT = 0.01D0
 
     DIMENSIONS = 1
     BOUNDARY   = 2
@@ -141,8 +141,8 @@ contains
 
        gamma(i, 1, 1) = 5.0D0 / 3.0D0
 
-       x_magfield(i, 1, 1) = 0.75D0
-       y_magfield(i, 1, 1) = -1.0D0
+       x_magfield(i, 1, 1) = 0.75D0 
+       y_magfield(i, 1, 1) = -1.0D0 
        z_magfield(i, 1, 1) = 0.0D0
 
 
@@ -210,7 +210,7 @@ contains
   ! ---------------
 
     DELTAT   = 0.0001D0                  
-    FULLTIME = 1.0D0        
+    FULLTIME = 5.0D0        
 
     COURANT    = 0.25D0
     MAX_DELTAT = 0.01D0    
@@ -218,8 +218,8 @@ contains
     DIMENSIONS = 2
     BOUNDARY   = 2
 
-    XSIZE = 24     
-    YSIZE = 24    
+    XSIZE = 32     
+    YSIZE = 32    
     ZSIZE = 1    
 
     alpha = PI / 6.0D0   
@@ -228,7 +228,7 @@ contains
     YDOMN = 1.0D0 / sin(alpha)           
     ZDOMN = 1.0D0 * (real(ZSIZE) / real(XSIZE))
 
-    MHDUNITS = 1     ! see <SET_C>
+    MHDUNITS = 2     ! see <SET_C>
 
 
 
@@ -260,7 +260,7 @@ contains
           x = (real(i) - 0.5D0) * DELTAX
           y = (real(j) - 0.5D0) * DELTAY
 
-          v_prll(i, j) = 1.0D0
+          v_prll(i, j) = 0.0D0
           v_perp(i, j) = 0.1 * sin(2.0D0 * PI * (x * cos(alpha) + y * sin(alpha)))
           B_prll(i, j) = 1.0D0
           B_perp(i, j) = v_perp(i, j)
@@ -291,9 +291,9 @@ contains
 
           gamma(i, j, 1) = 5.0D0 / 3.0D0     
 
-          x_magfield(i, j, 1) = ((B_prll(i, j) * cos(alpha)) - (B_perp(i, j) * sin(alpha))) * dsqrt(4.0D0 * PI)
-          y_magfield(i, j, 1) = ((B_prll(i, j) * sin(alpha)) + (B_perp(i, j) * cos(alpha))) * dsqrt(4.0D0 * PI)
-          z_magfield(i, j, 1) = (0.1 * cos(2.0D0 * PI * (x * cos(alpha) + y * sin(alpha)))) * dsqrt(4.0D0 * PI)                  
+          x_magfield(i, j, 1) = ((B_prll(i, j) * cos(alpha)) - (B_perp(i, j) * sin(alpha)))
+          y_magfield(i, j, 1) = ((B_prll(i, j) * sin(alpha)) + (B_perp(i, j) * cos(alpha))) 
+          z_magfield(i, j, 1) = (0.1 * cos(2.0D0 * PI * (x * cos(alpha) + y * sin(alpha))))   
 
           ! Note: these values are set automatically.
 
@@ -369,8 +369,8 @@ contains
     DELTAT   = 0.00001D0
     FULLTIME = 0.2D0
 
-    COURANT    = 0.4D0
-    MAX_DELTAT = 0.0001D0
+    COURANT    = 0.25D0
+    MAX_DELTAT = 0.01D0
 
     DIMENSIONS = 2
     BOUNDARY   = 2
@@ -491,8 +491,8 @@ contains
     DELTAT   = 0.00001D0
     FULLTIME = 0.25D0
 
-    COURANT    = 0.4D0
-    MAX_DELTAT = 0.0001D0
+    COURANT    = 0.25D0
+    MAX_DELTAT = 0.01D0
  
     DIMENSIONS = 2
     BOUNDARY   = 2
@@ -614,8 +614,8 @@ contains
     DELTAT   = 0.00001D0
     FULLTIME = 0.15D0  
 
-    COURANT    = 0.4D0
-    MAX_DELTAT = 0.001D0    
+    COURANT    = 0.25D0
+    MAX_DELTAT = 0.01D0    
   
     DIMENSIONS = 2
     BOUNDARY   = 2
@@ -760,8 +760,8 @@ contains
     DELTAT   = 0.00001D0
     FULLTIME = 1.0D0
 
-    COURANT    = 0.4D0
-    MAX_DELTAT = 0.001D0
+    COURANT    = 0.25D0
+    MAX_DELTAT = 0.01D0
 
     DIMENSIONS = 2
     BOUNDARY   = 2
