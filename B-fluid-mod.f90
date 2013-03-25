@@ -270,8 +270,10 @@ contains
     real (PREC), dimension(3) :: magf
     real (PREC) :: magf_squrd
 
-    real (PREC) :: b_factor, a2, Ca2
+    real (PREC) :: a2, Ca2
     real (PREC) :: Cax2, Cay2, Caz2
+
+    real (PREC), parameter :: epsilon = 1.0D-10
     integer :: i, j, k
 
 
@@ -350,6 +352,10 @@ contains
 
   ! Calculating the new timestep.
   ! -----------------------------
+
+    x_max_sigspeed = max(x_max_sigspeed, epsilon)
+    y_max_sigspeed = max(y_max_sigspeed, epsilon)
+    z_max_sigspeed = max(z_max_sigspeed, epsilon)
              
     DELTAT = COURANT * min((DELTAX/x_max_sigspeed), (DELTAY/y_max_sigspeed), (DELTAZ/z_max_sigspeed))
 
