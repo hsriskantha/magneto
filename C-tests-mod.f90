@@ -628,7 +628,7 @@ contains
     YDOMN = 1.0D0
     ZDOMN = 1.0D0 * (real(ZSIZE) / real(XSIZE))
 
-    MHDUNITS = 1     ! see <SET_C>
+    MHDUNITS = 2     ! see <SET_C>
 
 
 
@@ -672,7 +672,7 @@ contains
 
           gamma(i, j, 1) = 1.4D0                     
 
-          x_magfield(i, j, 1) = 5.0D0                                         
+          x_magfield(i, j, 1) = 5.0D0 / dsqrt(4.0D0 * PI)                                    
           y_magfield(i, j, 1) = 0.0D0                                          
           z_magfield(i, j, 1) = 0.0D0              
 

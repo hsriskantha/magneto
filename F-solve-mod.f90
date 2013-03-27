@@ -153,7 +153,7 @@ contains
 
     real (PREC), dimension(3) :: velc, magf
 
-    real (PREC) :: gas_pressure, cfL, cfR
+    real (PREC) :: gas_pressure, a2, ca2, cax2, s1, s2, cfL, cfR
 
     real (PREC) :: cL, cR, bL, bR, qL, qR, wL, wR, magf_squrd, scratch, roe_temp
 
@@ -161,6 +161,8 @@ contains
 
     real (PREC) ::  x_momentum_SX1, y_momentum_SX1
     real (PREC) ::  z_momentum_SX1, denRS, denLS
+
+    real (PREC), parameter :: epsilon = 1.0D-10
 
     integer :: m
 
@@ -219,16 +221,21 @@ contains
        ! Setting SL and SR
 
        if (MAG_WAVESPEED) then
-          
+
           magf = Create_vector (x_magfield_L(m), y_magfield_L(m), z_magfield_L(m))
           magf_squrd = Dotproduct (magf, magf)
 
           gas_pressure = Calculate_gas_pressure (pressure_L(m), magf_squrd)
 
-          scratch = (gamma_L(m) * gas_pressure) + (magf_squrd * MHDF(2))
+          a2 = (gamma_L(m) * gas_pressure) / density_L(m)
+          
+          ca2  = (MHDF(2) * magf_squrd) / density_L(m)
+          cax2 = (MHDF(2) * x_magfield_L(m)**2.0D0) / density_L(m)
 
-          cfL = scratch + dsqrt(scratch**2.0D0 - (4.0D0 * gamma_L(m) * gas_pressure * x_magfield_L(m)**2.0D0 * MHDF(2)))
-          cfL = dsqrt(cfL / (2.0D0 * density_L(m)))
+          s1 = a2 + ca2
+          s2 = 4.0D0 * a2 * cax2
+
+          cfL = dsqrt(0.5D0 * (s1 + dsqrt(s1**2.0D0 - s2)))
 
 
           magf = Create_vector (x_magfield_R(m), y_magfield_R(m), z_magfield_R(m))
@@ -236,10 +243,15 @@ contains
 
           gas_pressure = Calculate_gas_pressure (pressure_R(m), magf_squrd)
 
-          scratch = (gamma_R(m) * gas_pressure) + (magf_squrd * MHDF(2))
+          a2 = (gamma_R(m) * gas_pressure) / density_R(m)
+          
+          ca2  = (MHDF(2) * magf_squrd) / density_R(m)
+          cax2 = (MHDF(2) * x_magfield_R(m)**2.0D0) / density_R(m)
 
-          cfR = scratch + dsqrt(scratch**2.0D0 - (4.0D0 * gamma_R(m) * gas_pressure * x_magfield_R(m)**2.0D0 * MHDF(2)))
-          cfR = dsqrt(cfR / (2.0D0 * density_R(m)))
+          s1 = a2 + ca2
+          s2 = 4.0D0 * a2 * cax2
+
+          cfR = dsqrt(0.5D0 * (s1 + dsqrt(s1**2.0D0 - s2)))
 
           
           SL(m) = min(x_velocity_L(m), x_velocity_R(m)) - max(cfL, cfR)
@@ -350,18 +362,24 @@ contains
 
        scratch = (density_L(m) * (SL(m) - x_velocity_L(m)) * (SL(m) - SM(m))) - (MHDF(2) * x_magfield_S1(m)**2.0D0)
 
-       y_velocity_SL1(m) = y_velocity_L(m) - ((MHDF(2) * x_magfield_S1(m) * y_magfield_L(m) * (SM(m) - x_velocity_L(m))) / scratch)
-       z_velocity_SL1(m) = z_velocity_L(m) - ((MHDF(2) * x_magfield_S1(m) * z_magfield_L(m) * (SM(m) - x_velocity_L(m))) / scratch)
+       if (abs(scratch) < epsilon) then
 
-       y_magfield_SL1(m) = y_magfield_L(m) * (density_L(m) * (SL(m) - x_velocity_L(m))**2.0D0 - MHDF(2) * x_magfield_S1(m)**2.0D0)
-       z_magfield_SL1(m) = z_magfield_L(m) * (density_L(m) * (SL(m) - x_velocity_L(m))**2.0D0 - MHDF(2) * x_magfield_S1(m)**2.0D0)
-       y_magfield_SL1(m) = y_magfield_SL1(m) / scratch
-       z_magfield_SL1(m) = z_magfield_SL1(m) / scratch
+          y_velocity_SL1(m) = y_velocity_L(m)
+          z_velocity_SL1(m) = z_velocity_L(m)
+          y_magfield_SR1(m) = 0.0D0
+          z_magfield_SR1(m) = 0.0D0
 
-       if (y_velocity_SL1(m) /= y_velocity_SL1(m)) y_velocity_SL1(m) = y_velocity_L(m)
-       if (z_velocity_SL1(m) /= z_velocity_SL1(m)) z_velocity_SL1(m) = z_velocity_L(m)
-       if (y_magfield_SL1(m) /= y_magfield_SL1(m)) y_magfield_SL1(m) = 0.00D0
-       if (z_magfield_SL1(m) /= z_magfield_SL1(m)) z_magfield_SL1(m) = 0.0
+       else
+
+          y_velocity_SL1(m) = y_velocity_L(m) - ((MHDF(2)*x_magfield_S1(m)*y_magfield_L(m)*(SM(m) - x_velocity_L(m))) / scratch)
+          z_velocity_SL1(m) = z_velocity_L(m) - ((MHDF(2)*x_magfield_S1(m)*z_magfield_L(m)*(SM(m) - x_velocity_L(m))) / scratch)
+          
+          y_magfield_SL1(m) = y_magfield_L(m)*(density_L(m) * (SL(m) - x_velocity_L(m))**2.0D0 - MHDF(2)*x_magfield_S1(m)**2.0D0)
+          z_magfield_SL1(m) = z_magfield_L(m)*(density_L(m) * (SL(m) - x_velocity_L(m))**2.0D0 - MHDF(2)*x_magfield_S1(m)**2.0D0)
+          y_magfield_SL1(m) = y_magfield_SL1(m) / scratch
+          z_magfield_SL1(m) = z_magfield_SL1(m) / scratch
+          
+       end if
 
 
        uX  = Create_vector (x_velocity_L(m),  y_velocity_L(m),   z_velocity_L(m))
@@ -386,18 +404,24 @@ contains
 
        scratch = (density_R(m) * (SR(m) - x_velocity_R(m)) * (SR(m) - SM(m))) - (MHDF(2) * x_magfield_S1(m)**2.0D0)
 
-       y_velocity_SR1(m) = y_velocity_R(m) - ((MHDF(2) * x_magfield_S1(m) * y_magfield_R(m) * (SM(m) - x_velocity_R(m))) / scratch)
-       z_velocity_SR1(m) = z_velocity_R(m) - ((MHDF(2) * x_magfield_S1(m) * z_magfield_R(m) * (SM(m) - x_velocity_R(m))) / scratch)
+       if (abs(scratch) < epsilon) then
 
-       y_magfield_SR1(m) = y_magfield_R(m) * (density_R(m) * (SR(m) - x_velocity_R(m))**2.0D0 - MHDF(2) * x_magfield_S1(m)**2.0D0)
-       z_magfield_SR1(m) = z_magfield_R(m) * (density_R(m) * (SR(m) - x_velocity_R(m))**2.0D0 - MHDF(2) * x_magfield_S1(m)**2.0D0)
-       y_magfield_SR1(m) = y_magfield_SR1(m) / scratch
-       z_magfield_SR1(m) = z_magfield_SR1(m) / scratch
+          y_velocity_SR1(m) = y_velocity_R(m)
+          z_velocity_SR1(m) = z_velocity_R(m)
+          y_magfield_SR1(m) = 0.0D0
+          z_magfield_SR1(m) = 0.0D0
 
-       if (y_velocity_SR1(m) /= y_velocity_SR1(m)) y_velocity_SR1(m) = y_velocity_R(m)
-       if (z_velocity_SR1(m) /= z_velocity_SR1(m)) z_velocity_SR1(m) = z_velocity_R(m)
-       if (y_magfield_SR1(m) /= y_magfield_SR1(m)) y_magfield_SR1(m) = 0.00D0
-       if (z_magfield_SR1(m) /= z_magfield_SR1(m)) z_magfield_SR1(m) = 0.0
+       else
+
+          y_velocity_SR1(m) = y_velocity_R(m) - ((MHDF(2)*x_magfield_S1(m)*y_magfield_R(m) * (SM(m) - x_velocity_R(m))) / scratch)
+          z_velocity_SR1(m) = z_velocity_R(m) - ((MHDF(2)*x_magfield_S1(m)*z_magfield_R(m) * (SM(m) - x_velocity_R(m))) / scratch)
+          
+          y_magfield_SR1(m) = y_magfield_R(m) * (density_R(m)*(SR(m) - x_velocity_R(m))**2.0D0 - MHDF(2)*x_magfield_S1(m)**2.0D0)
+          z_magfield_SR1(m) = z_magfield_R(m) * (density_R(m)*(SR(m) - x_velocity_R(m))**2.0D0 - MHDF(2)*x_magfield_S1(m)**2.0D0)
+          y_magfield_SR1(m) = y_magfield_SR1(m) / scratch
+          z_magfield_SR1(m) = z_magfield_SR1(m) / scratch
+       
+       end if
 
 
        uX  = Create_vector (x_velocity_R(m),  y_velocity_R(m),   z_velocity_R(m))
