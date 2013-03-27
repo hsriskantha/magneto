@@ -17,7 +17,6 @@ module grids
 
   use setup
   use fluid
-  use tests
   implicit none
 
 

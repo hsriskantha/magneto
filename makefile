@@ -50,18 +50,15 @@ $(OBJS)G.o:	G-evolve-mod.f90 $(OBJS)A.o $(OBJS)B.o 		\
 		gfortran $(FFLAGS) -c -o $(OBJS)G.o		\
 		G-evolve-mod.f90	
 
-$(OBJS)F.o:	F-solve-mod.f90 $(OBJS)A.o $(OBJS)B.o 		\
-		$(OBJS)C.o $(OBJS)D.o $(OBJS)E.o
+$(OBJS)F.o:	F-solve-mod.f90 $(OBJS)A.o $(OBJS)E.o
 		gfortran $(FFLAGS) -c -o $(OBJS)F.o		\
 		F-solve-mod.f90	
 
-$(OBJS)E.o:	E-recon-mod.f90 $(OBJS)A.o $(OBJS)B.o 		\
-		$(OBJS)C.o $(OBJS)D.o
+$(OBJS)E.o:	E-recon-mod.f90 $(OBJS)A.o $(OBJS)D.o
 		gfortran $(FFLAGS) -c -o $(OBJS)E.o		\
 		E-recon-mod.f90	
 
-$(OBJS)D.o:	D-grids-mod.f90 $(OBJS)A.o $(OBJS)B.o 		\
-		$(OBJS)C.o	
+$(OBJS)D.o:	D-grids-mod.f90 $(OBJS)A.o $(OBJS)B.o 			
 		gfortran $(FFLAGS) -c -o $(OBJS)D.o		\
 		D-grids-mod.f90	
 

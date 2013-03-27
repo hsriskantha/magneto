@@ -16,8 +16,6 @@
 module recon
 
   use setup
-  use fluid
-  use tests
   use grids
   implicit none
 

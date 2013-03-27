@@ -16,9 +16,6 @@
 module solve
 
   use setup
-  use fluid
-  use tests
-  use grids
   use recon
   implicit none
 
