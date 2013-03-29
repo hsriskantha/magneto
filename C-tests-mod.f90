@@ -218,8 +218,8 @@ contains
     DIMENSIONS = 2
     BOUNDARY   = 2
 
-    XSIZE = 32     
-    YSIZE = 32    
+    XSIZE = 24     
+    YSIZE = 24    
     ZSIZE = 1    
 
     alpha = PI / 6.0D0   
@@ -615,7 +615,7 @@ contains
     FULLTIME = 0.15D0  
 
     COURANT    = 0.25D0
-    MAX_DELTAT = 0.01D0    
+    MAX_DELTAT = 0.001D0    
   
     DIMENSIONS = 2
     BOUNDARY   = 2
@@ -628,7 +628,7 @@ contains
     YDOMN = 1.0D0
     ZDOMN = 1.0D0 * (real(ZSIZE) / real(XSIZE))
 
-    MHDUNITS = 2     ! see <SET_C>
+    MHDUNITS = 1     ! see <SET_C>
 
 
 
@@ -672,7 +672,7 @@ contains
 
           gamma(i, j, 1) = 1.4D0                     
 
-          x_magfield(i, j, 1) = 5.0D0 / dsqrt(4.0D0 * PI)                                    
+          x_magfield(i, j, 1) = 5.0D0                                 
           y_magfield(i, j, 1) = 0.0D0                                          
           z_magfield(i, j, 1) = 0.0D0              
 

@@ -599,6 +599,8 @@ contains
 
        gas_pressure_1D(m) = Calculate_gas_pressure (pressure_1D(m), magf_squrd)
 
+       scratch1 = dsqrt(gas_pressure_1D(m))
+
 
        ! Storing the state vector
 

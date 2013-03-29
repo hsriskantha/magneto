@@ -165,6 +165,9 @@ contains
 
 
 
+    real (PREC) :: pbl, pbr, gpl, gpr, gpbl, gpbr, cfmax, Bxsq
+
+
 
 ! --- PART ONE: Preliminary Calculations -------------------------------------------------------------------------------------------
 

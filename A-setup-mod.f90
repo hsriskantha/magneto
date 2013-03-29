@@ -24,10 +24,10 @@ module setup
   character, parameter :: RECONSTRUCT_TYPE = 'T'
   character, parameter :: OUTPUT_TYPE      = 'C'
 
-  logical, parameter :: VARIABLE_DELTAT  = .true.
+  logical, parameter :: VARIABLE_DELTAT  = .false.
   logical, parameter :: PRINT_DELTAT     = .true.
   logical, parameter :: MAG_WAVESPEED    = .true.
-  logical, parameter :: PRESSURE_FIX     = .false.
+  logical, parameter :: PRESSURE_FIX     = .true.
 
   integer, parameter :: PRINT_FREQ = 100
 
