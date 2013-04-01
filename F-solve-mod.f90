@@ -159,7 +159,7 @@ contains
     real (PREC) ::  x_momentum_SX1, y_momentum_SX1
     real (PREC) ::  z_momentum_SX1, denRS, denLS
 
-    real (PREC), parameter :: epsilon = 1.0D-10
+    real (PREC), parameter :: epsilon = 1.0D-14
 
     integer :: m
 
@@ -222,40 +222,59 @@ contains
 
        if (MAG_WAVESPEED) then
 
+!!$          magf = Create_vector (x_magfield_L(m), y_magfield_L(m), z_magfield_L(m))
+!!$          magf_squrd = Dotproduct (magf, magf)
+!!$
+!!$          gas_pressure = Calculate_gas_pressure (pressure_L(m), magf_squrd)
+!!$
+!!$          a2 = (gamma_L(m) * gas_pressure) / density_L(m)
+!!$          
+!!$          ca2  = (MHDF(2) * magf_squrd) / density_L(m)
+!!$          cax2 = (MHDF(2) * x_magfield_L(m)**2.0D0) / density_L(m)
+!!$
+!!$          s1 = a2 + ca2
+!!$          s2 = 4.0D0 * a2 * cax2
+!!$
+!!$          cfL = dsqrt(0.5D0 * (s1 + dsqrt(s1**2.0D0 - s2)))
+!!$
+!!$
+!!$          magf = Create_vector (x_magfield_R(m), y_magfield_R(m), z_magfield_R(m))
+!!$          magf_squrd = Dotproduct (magf, magf)
+!!$
+!!$          gas_pressure = Calculate_gas_pressure (pressure_R(m), magf_squrd)
+!!$
+!!$          a2 = (gamma_R(m) * gas_pressure) / density_R(m)
+!!$          
+!!$          ca2  = (MHDF(2) * magf_squrd) / density_R(m)
+!!$          cax2 = (MHDF(2) * x_magfield_R(m)**2.0D0) / density_R(m)
+!!$
+!!$          s1 = a2 + ca2
+!!$          s2 = 4.0D0 * a2 * cax2
+!!$
+!!$          cfR = dsqrt(0.5D0 * (s1 + dsqrt(s1**2.0D0 - s2)))
+!!$
+!!$          
+!!$          SL(m) = min(x_velocity_L(m), x_velocity_R(m)) - max(cfL, cfR)
+!!$          SR(m) = max(x_velocity_L(m), x_velocity_R(m)) + max(cfL, cfR)
+
+          a2 = gamma_1D(m) * max(pressure_L(m), pressure_R(m)) / min(density_L(m), density_R(m))
+
           magf = Create_vector (x_magfield_L(m), y_magfield_L(m), z_magfield_L(m))
-          magf_squrd = Dotproduct (magf, magf)
-
-          gas_pressure = Calculate_gas_pressure (pressure_L(m), magf_squrd)
-
-          a2 = (gamma_L(m) * gas_pressure) / density_L(m)
-          
-          ca2  = (MHDF(2) * magf_squrd) / density_L(m)
-          cax2 = (MHDF(2) * x_magfield_L(m)**2.0D0) / density_L(m)
-
-          s1 = a2 + ca2
-          s2 = 4.0D0 * a2 * cax2
-
-          cfL = dsqrt(0.5D0 * (s1 + dsqrt(s1**2.0D0 - s2)))
-
+          s1 = Dotproduct (magf, magf) * MHDF(2)
 
           magf = Create_vector (x_magfield_R(m), y_magfield_R(m), z_magfield_R(m))
-          magf_squrd = Dotproduct (magf, magf)
+          s2 = Dotproduct (magf, magf) * MHDF(2)
 
-          gas_pressure = Calculate_gas_pressure (pressure_R(m), magf_squrd)
+          ca2 = max(s1, s2) / min(density_L(m), density_R(m))
 
-          a2 = (gamma_R(m) * gas_pressure) / density_R(m)
-          
-          ca2  = (MHDF(2) * magf_squrd) / density_R(m)
-          cax2 = (MHDF(2) * x_magfield_R(m)**2.0D0) / density_R(m)
+          cax2 = max(x_magfield_L(m)**2.0D0, x_magfield_R(m)**2.0D0) * MHDF(2) / min(density_L(m), density_R(m))
 
-          s1 = a2 + ca2
-          s2 = 4.0D0 * a2 * cax2
+          s1 = (a2 - ca2)**2.0D0 + (4.0D0 * a2 * (ca2 - cax2))
+          s2 = 0.5D0 * (a2 + ca2 + sqrt(s1))
 
-          cfR = dsqrt(0.5D0 * (s1 + dsqrt(s1**2.0D0 - s2)))
+          SL(m) = min(x_velocity_L(m), x_velocity_R(m)) - sqrt(s2)
+          SR(m) = max(x_velocity_L(m), x_velocity_R(m)) + sqrt(s2)
 
-          
-          SL(m) = min(x_velocity_L(m), x_velocity_R(m)) - max(cfL, cfR)
-          SR(m) = max(x_velocity_L(m), x_velocity_R(m)) + max(cfL, cfR)
 
        else
        
@@ -336,6 +355,8 @@ contains
 
     do m = BOUNDARY, rowsize + BOUNDARY
 
+       ! Calculating the pressure
+
        scratch = (density_L(m) * density_R(m)) * (SR(m) - x_velocity_R(m)) 
        scratch = scratch * (SL(m) - x_velocity_L(m)) * (x_velocity_R(m) - x_velocity_L(m))
 
@@ -344,6 +365,9 @@ contains
 
        scratch = ((SR(m) - x_velocity_R(m)) * density_R(m)) - ((SL(m) - x_velocity_L(m)) * density_L(m))
        pressure_S1(m) = pressure_S1(m) / scratch
+
+
+       ! The x-velocity and x-magnetic-field
 
        x_velocity_S1(m) = SM(m)
        x_magfield_S1(m) = x_magfield_L(m)
