@@ -66,7 +66,7 @@ contains
     ! RECONSTRUCT_TYPE
 
     string_test = 0
-    string_test = verify(RECONSTRUCT_TYPE, 'T')
+    string_test = verify(RECONSTRUCT_TYPE, 'TP')
 
     if (string_test > 0) then
        write (*, *) 'ERROR: Invalid value of RECONSTRUCT_TYPE in A_setup_mod'

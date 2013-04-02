@@ -295,6 +295,7 @@ contains
   ! ----------------------------------
 
     if (RECONSTRUCT_TYPE == 'T') call Determine_Riemann_input_TVD     ! --> <REC02>
+    if (RECONSTRUCT_TYPE == 'P') call Determine_Riemann_input_PPM     ! --> <REC03>
 
     call Calculate_intercell_fluxes_HLLD ()     ! --> <SOL02>
 
@@ -497,7 +498,7 @@ contains
 
     call Deallocate_fluid ()           ! --> <FLU12>
     call Deallocate_grids ()           ! --> <GRI11>
-    call Deallocate_input_states()     ! --> <REC05>
+    call Deallocate_input_states()     ! --> <REC06>
     call Deallocate_solver ()          ! --> <SOL05>
 
 

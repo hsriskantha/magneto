@@ -21,7 +21,7 @@ module setup
   ! --------------------------------
 
   character, parameter :: TEST_PROBLEM     = 'B'
-  character, parameter :: RECONSTRUCT_TYPE = 'T'
+  character, parameter :: RECONSTRUCT_TYPE = 'P'
   character, parameter :: OUTPUT_TYPE      = 'C'
 
   logical, parameter :: VARIABLE_DELTAT  = .false.

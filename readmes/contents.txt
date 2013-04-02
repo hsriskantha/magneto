@@ -223,15 +223,18 @@ FUNCTIONS AND SUBROUTINES
            Initialise the Riemann Problem Input States
 
 - [REC02]: subroutine Determine_Riemann_input_TVD ()
-           Determine the Input States for the Riemann Problem (using balsara's TVD Scheme)
+           Determine the Input States for the Riemann Problem (using Balsara's TVD Scheme)
 
-- [REC03]: function minmod (x, y)
+- [REC03]: subroutine Determine_Riemann_input_PPM ()
+  	   Determine the Input States for the Riemann Problem (using Piecewise Parabolic Method)
+
+- [REC04]: function minmod (x, y)
            General Minmod Function
 
-- [REC04]: subroutine Calculate_eigensystem ()
+- [REC05]: subroutine Calculate_eigensystem ()
            Calculate the Eigen-system
 
-- [REC05]: subroutine Deallocate_input_states ()
+- [REC06]: subroutine Deallocate_input_states ()
            Deallocate the Input States
 
 
