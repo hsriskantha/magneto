@@ -711,28 +711,48 @@ contains
   ! Step seven: further monotonicity constraints.
   ! ---------------------------------------------
 
+    ! Taken from the Athena (Fortran) source code
+
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
 
-       if (((w_R(q, m) - w(q, m)) * (w(q, m) - w_L(q, m))) <= 0.0D0) then
+       do q = 1, 7
 
-          w_L(q, m) = w(q, m)
-          w_R(q, m) = w(q, m)
+          w_L(q, m) = max(min(w(q, m), w(q, m-1)), w_L(q, m))
+          w_L(q, m) = min(max(w(q, m), w(q, m-1)), w_L(q, m))
+          w_R(q, m) = max(min(w(q, m), w(q, m+1)), w_R(q, m))
+          w_R(q, m) = min(max(w(q, m), w(q, m+1)), w_R(q, m))
 
-       end if
+       end do
+
+    end do
 
 
-       scratch1 = (w_R(q, m) - w_L(q, m))
-       scratch2 = (w_R(q, m) + w_L(q, m)) / 0.5D0
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
 
-       if ((6.0D0 * scratch1) * (w(q, m) - scratch2) > scratch1**2.0D0) then
+       do q = 1, 7
 
-          w_L(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_R(q, m))
+          if (((w_R(q, m) - w(q, m)) * (w(q, m) - w_L(q, m))) <= 0.0D0) then
 
-       else if ((6.0D0 * scratch1) * (w(q, m) - scratch2) < -scratch1**2.0D0) then
+             w_L(q, m) = w(q, m)
+             w_R(q, m) = w(q, m)
+             
+          end if
+          
+          
+          scratch1 = (w_R(q, m) - w_L(q, m))
+          scratch2 = (w_R(q, m) + w_L(q, m)) / 2.0D0
+          
+          if ((6.0D0 * scratch1) * (w(q, m) - scratch2) > scratch1**2.0D0) then
+             
+             w_L(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_R(q, m))
+             
+          else if ((6.0D0 * scratch1) * (w(q, m) - scratch2) < -(scratch1)**2.0D0) then
+             
+             w_R(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_L(q, m))
+             
+          end if
 
-          w_R(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_L(q, m))
-
-       end if
+       end do
 
     end do
 
@@ -785,10 +805,11 @@ contains
        end do
     end do
 
+
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do p = 1, 7
 
-          if (lambda(p, m) .gt. 0.0D0) then
+          if (lambda(p, m) > 0.0D0) then
 
              C = 0.0D0
 
@@ -806,7 +827,7 @@ contains
           end if
 
 
-          if (lambda(p, m) .lt. 0.0D0) then
+          if (lambda(p, m) < 0.0D0) then
 
              C = 0.0D0
 
@@ -854,7 +875,6 @@ contains
        velc_squrd = Dotproduct (velc, velc)
 
        pressure_L(m)   = w_new_L(5, m) + (0.5D0 * magf_squrd * MHDF(2))
-
        energy_L(m)     = Calculate_energy_EOS (density_L(m), pressure_L(m), gamma_L(m), velc_squrd, magf_squrd)
 
 

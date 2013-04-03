@@ -24,7 +24,7 @@ module setup
   character, parameter :: RECONSTRUCT_TYPE = 'P'
   character, parameter :: OUTPUT_TYPE      = 'C'
 
-  logical, parameter :: VARIABLE_DELTAT  = .false.
+  logical, parameter :: VARIABLE_DELTAT  = .true.
   logical, parameter :: PRINT_DELTAT     = .true.
   logical, parameter :: MAG_WAVESPEED    = .true.
   logical, parameter :: PRESSURE_FIX     = .true.

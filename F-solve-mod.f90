@@ -222,6 +222,10 @@ contains
 
        if (MAG_WAVESPEED) then
 
+
+          ! The main estimate
+          ! =================
+
 !!$          magf = Create_vector (x_magfield_L(m), y_magfield_L(m), z_magfield_L(m))
 !!$          magf_squrd = Dotproduct (magf, magf)
 !!$
@@ -257,6 +261,10 @@ contains
 !!$          SL(m) = min(x_velocity_L(m), x_velocity_R(m)) - max(cfL, cfR)
 !!$          SR(m) = max(x_velocity_L(m), x_velocity_R(m)) + max(cfL, cfR)
 
+
+          ! The alternative estimate
+          ! ========================
+
           a2 = gamma_1D(m) * max(pressure_L(m), pressure_R(m)) / min(density_L(m), density_R(m))
 
           magf = Create_vector (x_magfield_L(m), y_magfield_L(m), z_magfield_L(m))
@@ -274,6 +282,35 @@ contains
 
           SL(m) = min(x_velocity_L(m), x_velocity_R(m)) - sqrt(s2)
           SR(m) = max(x_velocity_L(m), x_velocity_R(m)) + sqrt(s2)
+
+
+          ! The incorrect estimate
+          ! ======================
+
+!!$          magf = Create_vector (x_magfield_L(m), y_magfield_L(m), z_magfield_L(m))
+!!$          magf_squrd = Dotproduct (magf, magf)
+!!$
+!!$          gas_pressure = Calculate_gas_pressure (pressure_L(m), magf_squrd)
+!!$
+!!$          scratch = (gamma_L(m) * gas_pressure) + magf_squrd
+!!$
+!!$          cfL = scratch + dsqrt(scratch**2.0D0 - (4.0D0 * gamma_L(m) * gas_pressure * x_magfield_L(m)**2.0D0 * MHDF(2)))
+!!$          cfL = dsqrt(scratch / (2.0D0 * density_L(m)))
+!!$
+!!$
+!!$          magf = Create_vector (x_magfield_R(m), y_magfield_R(m), z_magfield_R(m))
+!!$          magf_squrd = Dotproduct (magf, magf)
+!!$
+!!$          gas_pressure = Calculate_gas_pressure (pressure_R(m), magf_squrd)
+!!$
+!!$          scratch = (gamma_R(m) * gas_pressure) + magf_squrd
+!!$
+!!$          cfR = scratch + dsqrt(scratch**2.0D0 - (4.0D0 * gamma_R(m) * gas_pressure * x_magfield_R(m)**2.0D0 * MHDF(2)))
+!!$          cfR = dsqrt(scratch / (2.0D0 * density_R(m)))
+!!$
+!!$          
+!!$          SL(m) = min(x_velocity_L(m), x_velocity_R(m)) - max(cfL, cfR)
+!!$          SR(m) = max(x_velocity_L(m), x_velocity_R(m)) + max(cfL, cfR)
 
 
        else
