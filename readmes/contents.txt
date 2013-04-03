@@ -229,7 +229,7 @@ FUNCTIONS AND SUBROUTINES
   	   Determine the Input States for the Riemann Problem (using Piecewise Parabolic Method)
 
 - [REC04]: subroutine Determine_Riemann_input_PPML ()
-           Determine the Input States for the Riemann Problem (using Piecewise Parabolic Method with limiter)
+           Determine the Input States for the Riemann Problem (using Piecewise Parabolic Method with CS limiter)
 
 - [REC05]: function minmod (x, y)
            General Minmod Function

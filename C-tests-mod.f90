@@ -218,8 +218,8 @@ contains
     DIMENSIONS = 2
     BOUNDARY   = 4
 
-    XSIZE = 32     
-    YSIZE = 32    
+    XSIZE = 24     
+    YSIZE = 24    
     ZSIZE = 1    
 
     alpha = PI / 6.0D0   
