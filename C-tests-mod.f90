@@ -615,7 +615,7 @@ contains
     FULLTIME = 0.15D0  
 
     COURANT    = 0.25D0
-    MAX_DELTAT = 0.001D0    
+    MAX_DELTAT = 0.01D0    
   
     DIMENSIONS = 2
     BOUNDARY   = 2
