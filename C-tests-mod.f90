@@ -61,7 +61,7 @@ contains
     MAX_DELTAT = 0.001D0
 
     DIMENSIONS = 1
-    BOUNDARY   = 2
+    BOUNDARY   = 4
 
     XSIZE = 400
     YSIZE = 1
@@ -213,10 +213,10 @@ contains
     FULLTIME = 1.0D0        
 
     COURANT    = 0.25D0
-    MAX_DELTAT = 0.001D0    
+    MAX_DELTAT = 0.01D0    
   
     DIMENSIONS = 2
-    BOUNDARY   = 2
+    BOUNDARY   = 4
 
     XSIZE = 32     
     YSIZE = 32    
@@ -373,7 +373,7 @@ contains
     MAX_DELTAT = 0.01D0
 
     DIMENSIONS = 2
-    BOUNDARY   = 2
+    BOUNDARY   = 4
 
     XSIZE = 200
     YSIZE = 300
@@ -495,7 +495,7 @@ contains
     MAX_DELTAT = 0.01D0
  
     DIMENSIONS = 2
-    BOUNDARY   = 2
+    BOUNDARY   = 4
 
     XSIZE = 128
     YSIZE = 128
@@ -618,7 +618,7 @@ contains
     MAX_DELTAT = 0.01D0    
   
     DIMENSIONS = 2
-    BOUNDARY   = 2
+    BOUNDARY   = 4
 
     XSIZE = 256
     YSIZE = 256
@@ -764,7 +764,7 @@ contains
     MAX_DELTAT = 0.01D0
 
     DIMENSIONS = 2
-    BOUNDARY   = 2
+    BOUNDARY   = 4
 
     XSIZE = 240
     YSIZE = 240

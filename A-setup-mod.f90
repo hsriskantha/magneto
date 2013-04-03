@@ -23,7 +23,7 @@ module setup
   character, parameter :: TEST_PROBLEM = 'B'
   character, parameter :: OUTPUT_TYPE  = 'C'
 
-  character, parameter :: RECONSTRUCT_TYPE = 'P'
+  character, parameter :: RECONSTRUCT_TYPE = 'L'
   character, parameter :: WAVESPEED_TYPE   = 'J'
   
   logical, parameter :: VARIABLE_DELTAT = .true.

@@ -941,8 +941,12 @@ contains
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do q = 1, 7
 
-          wh(q, m) = (7.0D0/12.0D0) * (w(q, m  ) - w(q, m+1)) &
-                   - (1.0D0/12.0D0) * (w(q, m-1) - w(q, m+2))
+!!$          wh(q, m) = (7.0D0/12.0D0) * (w(q, m  ) - w(q, m+1)) &
+!!$                   - (1.0D0/12.0D0) * (w(q, m-1) - w(q, m+2))
+
+          wh(q, m) = (37.0D0/60.0D0) * (w(q, m  ) + w(q, m+1)) &
+                   - ( 2.0D0/15.0D0) * (w(q, m-1) + w(q, m+2)) &
+                   + ( 1.0D0/60.0D0) * (w(q, m-2) + w(q, m+3))
 
        end do
     end do
@@ -1043,6 +1047,14 @@ contains
           end if
 
 
+          if (((w_R(q, m) - w(q, m)) * (w(q, m) - w_L(q, m))) <= 0.0D0) then
+
+             w_L(q, m) = w(q, m)
+             w_R(q, m) = w(q, m)
+             
+          end if
+
+
           scratch1 = (w_R(q, m) - w_L(q, m))
           scratch2 = (w_R(q, m) + w_L(q, m)) / 2.0D0
           
@@ -1055,6 +1067,18 @@ contains
              w_R(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_L(q, m))
              
           end if
+
+       end do
+    end do
+
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+       do q = 1, 7
+
+          w_L(q, m) = max(min(w(q, m), w(q, m-1)), w_L(q, m))
+          w_L(q, m) = min(max(w(q, m), w(q, m-1)), w_L(q, m))
+          w_R(q, m) = max(min(w(q, m), w(q, m+1)), w_R(q, m))
+          w_R(q, m) = min(max(w(q, m), w(q, m+1)), w_R(q, m))
 
        end do
     end do
