@@ -218,52 +218,51 @@ contains
 
     do m =  BOUNDARY, rowsize + BOUNDARY
 
-       ! Setting SL and SR
+       ! Method of Miyoshi and Kusano, J. Comput. Phys. 208, 315 (2005) -- eq. (67)
 
-       if (MAG_WAVESPEED) then
+       if (WAVESPEED_TYPE == 'M') then
 
+          magf = Create_vector (x_magfield_L(m), y_magfield_L(m), z_magfield_L(m))
+          magf_squrd = Dotproduct (magf, magf)
 
-          ! The main estimate
-          ! =================
+          gas_pressure = Calculate_gas_pressure (pressure_L(m), magf_squrd)
 
-!!$          magf = Create_vector (x_magfield_L(m), y_magfield_L(m), z_magfield_L(m))
-!!$          magf_squrd = Dotproduct (magf, magf)
-!!$
-!!$          gas_pressure = Calculate_gas_pressure (pressure_L(m), magf_squrd)
-!!$
-!!$          a2 = (gamma_L(m) * gas_pressure) / density_L(m)
-!!$          
-!!$          ca2  = (MHDF(2) * magf_squrd) / density_L(m)
-!!$          cax2 = (MHDF(2) * x_magfield_L(m)**2.0D0) / density_L(m)
-!!$
-!!$          s1 = a2 + ca2
-!!$          s2 = 4.0D0 * a2 * cax2
-!!$
-!!$          cfL = dsqrt(0.5D0 * (s1 + dsqrt(s1**2.0D0 - s2)))
-!!$
-!!$
-!!$          magf = Create_vector (x_magfield_R(m), y_magfield_R(m), z_magfield_R(m))
-!!$          magf_squrd = Dotproduct (magf, magf)
-!!$
-!!$          gas_pressure = Calculate_gas_pressure (pressure_R(m), magf_squrd)
-!!$
-!!$          a2 = (gamma_R(m) * gas_pressure) / density_R(m)
-!!$          
-!!$          ca2  = (MHDF(2) * magf_squrd) / density_R(m)
-!!$          cax2 = (MHDF(2) * x_magfield_R(m)**2.0D0) / density_R(m)
-!!$
-!!$          s1 = a2 + ca2
-!!$          s2 = 4.0D0 * a2 * cax2
-!!$
-!!$          cfR = dsqrt(0.5D0 * (s1 + dsqrt(s1**2.0D0 - s2)))
-!!$
-!!$          
-!!$          SL(m) = min(x_velocity_L(m), x_velocity_R(m)) - max(cfL, cfR)
-!!$          SR(m) = max(x_velocity_L(m), x_velocity_R(m)) + max(cfL, cfR)
+          a2 = (gamma_L(m) * gas_pressure) / density_L(m)
+          
+          ca2  = (MHDF(2) * magf_squrd) / density_L(m)
+          cax2 = (MHDF(2) * x_magfield_L(m)**2.0D0) / density_L(m)
+
+          s1 = a2 + ca2
+          s2 = 4.0D0 * a2 * cax2
+
+          cfL = dsqrt(0.5D0 * (s1 + dsqrt(s1**2.0D0 - s2)))
 
 
-          ! The alternative estimate
-          ! ========================
+          magf = Create_vector (x_magfield_R(m), y_magfield_R(m), z_magfield_R(m))
+          magf_squrd = Dotproduct (magf, magf)
+
+          gas_pressure = Calculate_gas_pressure (pressure_R(m), magf_squrd)
+
+          a2 = (gamma_R(m) * gas_pressure) / density_R(m)
+          
+          ca2  = (MHDF(2) * magf_squrd) / density_R(m)
+          cax2 = (MHDF(2) * x_magfield_R(m)**2.0D0) / density_R(m)
+
+          s1 = a2 + ca2
+          s2 = 4.0D0 * a2 * cax2
+
+          cfR = dsqrt(0.5D0 * (s1 + dsqrt(s1**2.0D0 - s2)))
+
+          
+          SL(m) = min(x_velocity_L(m), x_velocity_R(m)) - max(cfL, cfR)
+          SR(m) = max(x_velocity_L(m), x_velocity_R(m)) + max(cfL, cfR)
+
+       end if
+
+
+       ! Method of Janhunen, J. Comput. Phys. 160, 649 (2000) -- eq. (27)
+
+       if (WAVESPEED_TYPE == 'J') then
 
           a2 = gamma_1D(m) * max(pressure_L(m), pressure_R(m)) / min(density_L(m), density_R(m))
 
@@ -273,93 +272,16 @@ contains
           magf = Create_vector (x_magfield_R(m), y_magfield_R(m), z_magfield_R(m))
           s2 = Dotproduct (magf, magf) * MHDF(2)
 
-          ca2 = max(s1, s2) / min(density_L(m), density_R(m))
-
+          ca2  = max(s1, s2) / min(density_L(m), density_R(m))
           cax2 = max(x_magfield_L(m)**2.0D0, x_magfield_R(m)**2.0D0) * MHDF(2) / min(density_L(m), density_R(m))
+
 
           s1 = (a2 - ca2)**2.0D0 + (4.0D0 * a2 * (ca2 - cax2))
           s2 = 0.5D0 * (a2 + ca2 + sqrt(s1))
 
           SL(m) = min(x_velocity_L(m), x_velocity_R(m)) - sqrt(s2)
           SR(m) = max(x_velocity_L(m), x_velocity_R(m)) + sqrt(s2)
-
-
-          ! The incorrect estimate
-          ! ======================
-
-!!$          magf = Create_vector (x_magfield_L(m), y_magfield_L(m), z_magfield_L(m))
-!!$          magf_squrd = Dotproduct (magf, magf)
-!!$
-!!$          gas_pressure = Calculate_gas_pressure (pressure_L(m), magf_squrd)
-!!$
-!!$          scratch = (gamma_L(m) * gas_pressure) + magf_squrd
-!!$
-!!$          cfL = scratch + dsqrt(scratch**2.0D0 - (4.0D0 * gamma_L(m) * gas_pressure * x_magfield_L(m)**2.0D0 * MHDF(2)))
-!!$          cfL = dsqrt(scratch / (2.0D0 * density_L(m)))
-!!$
-!!$
-!!$          magf = Create_vector (x_magfield_R(m), y_magfield_R(m), z_magfield_R(m))
-!!$          magf_squrd = Dotproduct (magf, magf)
-!!$
-!!$          gas_pressure = Calculate_gas_pressure (pressure_R(m), magf_squrd)
-!!$
-!!$          scratch = (gamma_R(m) * gas_pressure) + magf_squrd
-!!$
-!!$          cfR = scratch + dsqrt(scratch**2.0D0 - (4.0D0 * gamma_R(m) * gas_pressure * x_magfield_R(m)**2.0D0 * MHDF(2)))
-!!$          cfR = dsqrt(scratch / (2.0D0 * density_R(m)))
-!!$
-!!$          
-!!$          SL(m) = min(x_velocity_L(m), x_velocity_R(m)) - max(cfL, cfR)
-!!$          SR(m) = max(x_velocity_L(m), x_velocity_R(m)) + max(cfL, cfR)
-
-
-       else
        
-          xvel_roeav(m) = roeavg (density_L(m), density_R(m), x_velocity_L(m), x_velocity_R(m))
-          yvel_roeav(m) = roeavg (density_L(m), density_R(m), y_velocity_L(m), y_velocity_R(m))
-          zvel_roeav(m) = roeavg (density_L(m), density_R(m), z_velocity_L(m), z_velocity_R(m))
-          
-          speed_squrd(m) = xvel_roeav(m)**2.0D0 + yvel_roeav(m)**2.0D0 + zvel_roeav(m)**2.0D0
-
-          magf = Create_vector (x_magfield_L(m), y_magfield_L(m), z_magfield_L(m))
-          magf_squrd = Dotproduct (magf, magf)
-
-          gas_pressure = Calculate_gas_pressure (pressure_L(m), magf_squrd)
-
-          enthalpy_L(m) = (energy_L(m) + gas_pressure) / density_L(m)
-          cL = dsqrt (gamma_L(m) * gas_pressure / density_L(m))
-
-
-          magf = Create_vector (x_magfield_R(m), y_magfield_R(m), z_magfield_R(m))
-          magf_squrd = Dotproduct (magf, magf)
-
-          gas_pressure = Calculate_gas_pressure (pressure_R(m), magf_squrd)
-       
-          enthalpy_R(m) = (energy_R(m) + gas_pressure) / density_R(m)
-          cR = dsqrt (gamma_R(m) * gas_pressure / density_R(m))
-
-          
-          enth_roeav(m) = roeavg (density_L(m), density_R(m), enthalpy_L(m), enthalpy_R(m))
-          gmma_roeav(m) = roeavg (density_L(m), density_R(m), gamma_L(m),    gamma_R(m))
-          
-          sound_speed(m) = dsqrt ((gmma_roeav(m) - 1.0D0) * (enth_roeav(m) - (0.5D0 * speed_squrd(m))))
-
-          bL = dsqrt ((gamma_L(m) - 1.0D0) / (2.0D0 * gamma_L(m)))
-          bR = dsqrt ((gamma_R(m) - 1.0D0) / (2.0D0 * gamma_R(m)))
-          
-
-          if (sound_speed(m) /= sound_speed(m)) then
-             
-             SL(m) = x_velocity_L(m) - bL*cL
-             SR(m) = x_velocity_R(m) + bR*cR
-             
-          else
-             
-             SL(m) = min(xvel_roeav(m) - sound_speed(m), x_velocity_L(m) - bL*cL)
-             SR(m) = max(xvel_roeav(m) + sound_speed(m), x_velocity_R(m) + bR*cR)
-             
-          end if
-          
        end if
           
     end do

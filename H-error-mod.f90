@@ -56,20 +56,7 @@ contains
     string_test = verify(TEST_PROBLEM, 'ABCDEFX')
 
     if (string_test > 0) then
-       write (*, *) 'ERROR: Invalid value of TEST_PROBLEM in A_setup_mod'
-       write (*, *) ' --> See <SET_A> for more information.'
-       write (*, *) ' '
-       error_flag = .true.
-    end if
-
-
-    ! RECONSTRUCT_TYPE
-
-    string_test = 0
-    string_test = verify(RECONSTRUCT_TYPE, 'TP')
-
-    if (string_test > 0) then
-       write (*, *) 'ERROR: Invalid value of RECONSTRUCT_TYPE in A_setup_mod'
+       write (*, *) 'ERROR: Invalid value of TEST_PROBLEM in A-setup-mod'
        write (*, *) ' --> See <SET_A> for more information.'
        write (*, *) ' '
        error_flag = .true.
@@ -82,11 +69,39 @@ contains
     string_test = verify(OUTPUT_TYPE, 'ABC')
 
     if (string_test > 0) then
-       write (*, *) 'ERROR: Invalid value of OUTPUT_TYPE in A_setup_mod'
+       write (*, *) 'ERROR: Invalid value of OUTPUT_TYPE in A-setup-mod'
        write (*, *) ' --> See <SET_A> for more information.'
        write (*, *) ' '
        error_flag = .true.
     end if
+
+
+    ! RECONSTRUCT_TYPE
+
+    string_test = 0
+    string_test = verify(RECONSTRUCT_TYPE, 'TP')
+
+    if (string_test > 0) then
+       write (*, *) 'ERROR: Invalid value of RECONSTRUCT_TYPE in A-setup-mod'
+       write (*, *) ' --> See <SET_A> for more information.'
+       write (*, *) ' '
+       error_flag = .true.
+    end if
+
+
+    ! WAVESPEED_TYPE
+
+    string_test = 0
+    string_test = verify(WAVESPEED_TYPE, 'MJ')
+
+    if (string_test > 0) then
+       write (*, *) 'ERROR: Invalid value of WAVESPEED_TYPE in A-setup-mod'
+       write (*, *) ' --> See <SET_A> for more information.'
+       write (*, *) ' '
+       error_flag = .true.
+    end if
+
+
 
 
 
@@ -99,7 +114,7 @@ contains
        inquire(file='./output/restart2.bin', exist = restart_flag2)
 
        if ((restart_flag1 .eqv. .false.) .or. (restart_flag2 .eqv. .false.)) then
-          write (*, *) 'ERROR: You have chosen to use a restart file in A_setup_mod.'
+          write (*, *) 'ERROR: You have chosen to use a restart file in A-setup-mod.'
           write (*, *) 'However, at least one of the restart files cannot be found.'
           write (*, *) 'Make sure restart1.bin and restart2.bin are saved in the'
           write (*, *) 'folder ./output/ or alternatively choose a new test problem.'
