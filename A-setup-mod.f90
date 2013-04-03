@@ -60,13 +60,14 @@ module setup
   !     RECONSTRUCT_TYPE :: This setting determines the method used to calculate the input states for the Riemann problem.
   !     ----------------
   !       = 'T' - Balsara's TVD Scheme with steepening (second-order)
-  !       = 'P' - Piecewise Parabolic Method (third-order) - WARNING: not bug-free
+  !       = 'P' - Piecewise Parabolic Method (third-order)
+  !       = 'L' - Piecewise Parabolic Method (third-order) with limiter of Colella and Sekora
   !
   !
   !     WAVESPEED_TYPE :: This setting determines the method used to estimate the SL/SR wavespeeds in the HLLD Riemann solver.
   !     --------------
-  !       = 'M' - The method of Miyoshi and Kusano, J. Comput. Phys. 208, 315 (2005) -- eq. (67)
-  !       = 'J' - The method of Janhunen, J. Comput. Phys. 160, 649 (2000) -- eq. (27)
+  !       = 'M' - The method of Miyoshi and Kusano, J. Comput. Phys., 208, 315 (2005) -- eq. (67)
+  !       = 'J' - The method of Janhunen, J. Comput. Phys., 160, 649 (2000) -- eq. (27)
   !
   !
   !     Other Settings

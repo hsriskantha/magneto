@@ -86,7 +86,7 @@ module recon
   real (PREC), dimension(:,:), allocatable :: sigma, dw
 
 
-  ! Specific for PPM
+  ! Specific for PPM(L)
 
   real (PREC), dimension(:,:), allocatable :: wh
   
@@ -162,7 +162,10 @@ contains
 
     end if
 
-    if (RECONSTRUCT_TYPE == 'P') then
+
+    ! Specific for PPM(L)
+
+    if ((RECONSTRUCT_TYPE == 'P') .or. (RECONSTRUCT_TYPE == 'L')) then
 
        allocate (wh(7, MFULL))
 
@@ -257,7 +260,6 @@ contains
     psi = [2.0D0, 1.0D0, 2.0D0, 1.0D0, 2.0D0, 1.0D0, 2.0D0]
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-
        do q = 1, 7
 
           delta_w(q, m) = 0.0D0
@@ -273,7 +275,6 @@ contains
           end if
 
        end do
-
     end do
 
 
@@ -307,7 +308,6 @@ contains
     ! Calculating sigma
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-
        do q = 1, 7
 
           beta = 0.0D0
@@ -337,7 +337,6 @@ contains
           end if
 
        end do
-       
     end do
 
 
@@ -387,7 +386,6 @@ contains
     ! Slope modifier
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-
        do q = 1, 7
 
           dw(q, m) = 0.0D0
@@ -405,7 +403,6 @@ contains
           delta_w(q, m) = delta_w(q, m) + dw(q, m)
 
        end do
-
     end do
 
 
@@ -458,7 +455,6 @@ contains
 
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-
        do p = 1, 7
 
           if (lambda(p, m) .gt. 0.0D0) then
@@ -487,7 +483,6 @@ contains
           end if
 
        end do
-
     end do
 
 
@@ -575,7 +570,7 @@ contains
     logical :: cond1, cond2, cond3, cond4
 
     real (PREC) :: A, B, C
-    real (PREC) :: scratch1, scratch2, wlim
+    real (PREC) :: scratch1, scratch2
 
     integer :: m     ! m is used to label spatial position (i.e. m in [1, MFULL])
     integer :: p     ! p and q are used to label elements of state-based vectors (i.e. with 7 elements).  
@@ -594,7 +589,6 @@ contains
   ! ------------------------------------------------------
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-
        do q = 1, 7
 
           dwG(q, m) = 0.0D0
@@ -608,7 +602,6 @@ contains
           end if
 
        end do
-
     end do
 
 
@@ -617,7 +610,7 @@ contains
   ! --------------------------------------------------------------
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-
+    
        do q = 1, 7
 
           daL(q, m) = 0.0D0
@@ -646,7 +639,6 @@ contains
   ! ------------------------------------------
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-
        do q = 1, 7
 
           delta_a(q, m) = 0.0D0
@@ -663,7 +655,6 @@ contains
           end if
 
        end do
-
     end do
 
 
@@ -696,14 +687,12 @@ contains
   ! ----------------------------------
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-
        do q = 1, 7
 
           w_L(q, m) = ((w(q, m  ) + w(q, m-1))/2.0D0) - ((delta_w(q, m  ) - delta_w(q, m-1))/6.0D0)
           w_R(q, m) = ((w(q, m+1) + w(q, m  ))/2.0D0) - ((delta_w(q, m+1) - delta_w(q, m  ))/6.0D0)
 
        end do
-       
     end do
 
 
@@ -714,7 +703,6 @@ contains
     ! Taken from the Athena (Fortran) source code
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-
        do q = 1, 7
 
           w_L(q, m) = max(min(w(q, m), w(q, m-1)), w_L(q, m))
@@ -723,12 +711,10 @@ contains
           w_R(q, m) = min(max(w(q, m), w(q, m+1)), w_R(q, m))
 
        end do
-
     end do
 
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-
        do q = 1, 7
 
           if (((w_R(q, m) - w(q, m)) * (w(q, m) - w_L(q, m))) <= 0.0D0) then
@@ -753,7 +739,6 @@ contains
           end if
 
        end do
-
     end do
 
 
@@ -762,14 +747,12 @@ contains
   ! -------------------------------------
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-
        do q = 1, 7
 
           PPM_dw(q, m) = w_R(q, m) - w_L(q, m)
           PPM_w6(q, m) = (6.0D0 * w(q, m)) - 3.0D0 * (w_L(q, m) + w_R(q, m))
 
        end do
-
     end do
 
 
@@ -916,7 +899,325 @@ contains
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- FUNCTION: General Minmod Function -------------------------------------------------------------------------------- [REC04] ---
+! --- FUNCTION: Determine the Input States for the Riemann Problem (using Piecewise Parabolic Method with limiter)------ [REC04] ---
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+  subroutine Determine_Riemann_input_PPML ()
+
+  ! This subroutine uses the PPM algorithm of Collela and Woodward, J. Comput. Phys., 54, 174 (1984)
+  !   --> ... and the limiter of Colella and Sekora, J. Comput. Phys., 227, 7069 (2008)
+
+
+  ! Declaration of local variables.
+  ! -------------------------------
+
+    real (PREC), dimension(3) :: magf, velc
+    real (PREC) :: magf_squrd, velc_squrd
+
+    logical :: cond1, cond2, cond3, cond4
+
+    real (PREC) :: A, B, C
+    real (PREC) :: scratch1, scratch2, wlim
+
+    integer :: m     ! m is used to label spatial position (i.e. m in [1, MFULL])
+    integer :: p     ! p and q are used to label elements of state-based vectors (i.e. with 7 elements).  
+    integer :: q     !   Usually, p labels eigenvalues (e.g. p = 1 corresponds to v_x - c_f).
+
+    real (PREC), parameter :: epsilon = 1D-10
+    real (PREC), parameter :: Clim = 1.25D0
+
+
+
+  ! Step one: calculating eigen-system.
+  ! -----------------------------------
+
+    call Calculate_eigensystem ()
+
+
+
+  ! Step two: interpolating value at cell faces.
+  ! --------------------------------------------
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+       do q = 1, 7
+
+          wh(q, m) = (7.0D0/12.0D0) * (w(q, m  ) - w(q, m+1)) &
+                   - (1.0D0/12.0D0) * (w(q, m-1) - w(q, m+2))
+
+       end do
+    end do
+
+
+
+  ! Step three: limiting this value.
+  ! --------------------------------
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+       do q = 1, 7
+
+          daC(q, m) = 3.0D0 * (w(q, m  ) - 2.0D0 * wh(q, m  ) + w(q, m+1))
+          daL(q, m) =         (w(q, m-1) - 2.0D0 *  w(q, m  ) + w(q, m+1))
+          daR(q, m) =         (w(q, m  ) - 2.0D0 *  w(q, m+1) + w(q, m+2))
+
+       end do
+    end do
+
+    
+    do m = BOUNDARY,  (BOUNDARY + rowsize) + 1
+       do q = 1, 7
+          
+          daG(q, m) = 0.0D0
+          
+          cond1 = ((daC(q, m) > 0.0D0) .and. (daL(q, m) > 0.0D0) .and. (daR(q, m) > 0.0D0))
+          cond2 = ((daC(q, m) < 0.0D0) .and. (daL(q, m) < 0.0D0) .and. (daR(q, m) < 0.0D0))
+          
+          if (cond1 .or. cond2) then
+             
+             scratch1 = min(abs(daL(q, m)), abs(daR(q, m)))
+             
+             daG(q, m) = sign(1.0D0, daC(q, m)) * min(Clim * scratch1, abs(daC(q, m)))
+             
+          end if
+          
+          wh(q, m) = (0.5D0 * (w(q, m) + w(q, m+1))) + (daG(q, m)/3.0D0)
+
+       end do
+    end do
+
+
+
+  ! Step four: constructing the parabolic interpolant.
+  ! --------------------------------------------------
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+       do q = 1, 7
+
+          w_L(q, m) = wh(q, m-1)
+          w_R(q, m) = wh(q, m)
+
+       end do
+    end do
+
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+       do q = 1, 7
+
+          cond1 = ((w_R(q, m) - w(q, m)) * (w(q, m) - w_L(q, m)) <= 0.0D0)
+          cond2 = ((w(q, m-1) - w(q, m)) * (w(q, m) - w(q, m+1)) <= 0.0D0)
+
+          if (cond1 .or. cond2) then
+
+             PPM_w6(q, m) = (6.0D0 * w(q, m)) - 3.0D0 * (w_L(q, m) + w_R(q, m))
+
+             daG(q, m) = -2.0D0 * PPM_w6(q, m)
+
+             daC(q, m) = w(q, m-1) - 2.0D0 * w(q, m  ) + w(q, m+1)
+             daL(q, m) = w(q, m-2) - 2.0D0 * w(q, m-1) + w(q, m  )
+             daR(q, m) = w(q, m  ) - 2.0D0 * w(q, m+1) + w(q, m+2)
+
+             cond3 = ((daG(q, m) < 0.0D0) .and. (daC(q, m) < 0.0D0) .and. (daL(q, m) < 0.0D0) .and. (daR(q, m) < 0.0D0))
+             cond4 = ((daG(q, m) > 0.0D0) .and. (daC(q, m) > 0.0D0) .and. (daL(q, m) > 0.0D0) .and. (daR(q, m) > 0.0D0))
+
+             wlim = 0.0D0
+
+             if (cond3 .or. cond4) then
+
+                scratch1 = min(abs(daL(q, m)), abs(daR(q, m)), abs(daC(q, m)))
+
+                wlim = sign(1.0D0, daG(q, m)) * min(Clim * scratch1, abs(daG(q, m)))
+
+             end if
+
+             if (abs(daG(q, m)) < epsilon) then
+
+                w_L(q, m) = w(q, m)
+                w_R(q, m) = w(q, m)
+
+             else
+
+                w_L(q, m) = w(q, m) + (w_L(q, m) - w(q, m)) * (wlim/daG(q, m))
+                w_R(q, m) = w(q, m) + (w_R(q, m) - w(q, m)) * (wlim/daG(q, m))
+                
+             end if
+
+          end if
+
+
+          scratch1 = (w_R(q, m) - w_L(q, m))
+          scratch2 = (w_R(q, m) + w_L(q, m)) / 2.0D0
+          
+          if ((6.0D0 * scratch1) * (w(q, m) - scratch2) > scratch1**2.0D0) then
+             
+             w_L(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_R(q, m))
+             
+          else if ((6.0D0 * scratch1) * (w(q, m) - scratch2) < -(scratch1)**2.0D0) then
+             
+             w_R(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_L(q, m))
+             
+          end if
+
+       end do
+    end do
+
+
+
+  ! Step five: compute PPM coefficients.
+  ! ------------------------------------
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+       do q = 1, 7
+
+          PPM_dw(q, m) = w_R(q, m) - w_L(q, m)
+          PPM_w6(q, m) = (6.0D0 * w(q, m)) - 3.0D0 * (w_L(q, m) + w_R(q, m))
+
+       end do
+    end do
+
+
+
+  ! Step six: compute the left and right interface values.
+  ! ------------------------------------------------------
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+
+        scratch1 =  max(lambda(7, m), 0.0D0) * dtdx(m)
+        scratch2 = -min(lambda(1, m), 0.0D0) * dtdx(m)
+
+        do q = 1, 7
+
+           w_hat_L(q, m) = w_R(q, m) - (0.5D0 * scratch1) * (PPM_dw(q, m) - ((1.0D0 - (scratch1*(2.0D0/3.0D0))) * PPM_w6(q, m)))
+           w_hat_R(q, m) = w_L(q, m) + (0.5D0 * scratch2) * (PPM_dw(q, m) + ((1.0D0 - (scratch2*(2.0D0/3.0D0))) * PPM_w6(q, m)))
+
+        end do
+
+    end do
+
+
+
+  ! Step seven: the characteristic tracing.
+  ! ---------------------------------------
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+       do q = 1, 7
+
+          w_new_L(q, m) = w_hat_L(q, m)
+          w_new_R(q, m) = w_hat_R(q, m+1)
+
+       end do
+    end do
+
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+       do p = 1, 7
+
+          if (lambda(p, m) > 0.0D0) then
+
+             C = 0.0D0
+
+             A = 0.5D0 * dtdx(m) * (lambda(7, m) - lambda(p, m))
+             B = (1.0D0/3.0D0) * dtdx(m)**2.0D0 * (lambda(7, m)**2.0D0 - lambda(p, m)**2.0D0)
+
+             do q = 1, 7
+                C = C + L(p, q, m) * (A * (PPM_dw(q, m) - PPM_w6(q, m)) + (B * (PPM_w6(q, m))))
+             end do
+
+             do q = 1, 7
+                w_new_L(q, m) = w_new_L(q, m) + C * R(q, p, m)
+             end do
+
+          end if
+
+
+          if (lambda(p, m) < 0.0D0) then
+
+             C = 0.0D0
+
+             A = 0.5D0 * dtdx(m) * (lambda(1, m) - lambda(p, m))
+             B = (1.0D0/3.0D0) * dtdx(m)**2.0D0 * (lambda(1, m)**2.0D0 - lambda(p, m)**2.0D0)
+
+             do q = 1, 7
+                 C = C + L(p, q, m) * (A * (PPM_dw(q, m) + PPM_w6(q, m)) + (B * (PPM_w6(q, m))))
+             end do
+
+             do q = 1, 7
+               w_new_R(q, m) = w_new_R(q, m) + C * R(q, p, m)
+             end do
+
+          end if
+
+       end do
+    end do     
+
+
+
+  ! Step eight: the final left and right states.
+  ! --------------------------------------------                              
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+
+       density_L(m)    = w_new_L(1, m)
+       x_velocity_L(m) = w_new_L(2, m)
+       y_velocity_L(m) = w_new_L(3, m)
+       z_velocity_L(m) = w_new_L(4, m)
+       x_momentum_L(m) = w_new_L(1, m) * w_new_L(2, m)
+       y_momentum_L(m) = w_new_L(1, m) * w_new_L(3, m)
+       z_momentum_L(m) = w_new_L(1, m) * w_new_L(4, m)
+       gamma_L(m)      = gamma_1D(m)
+
+       x_magfield_L(m) = 0.5D0 * (x_magfield_1D(m) + x_magfield_1D(m+1))
+       y_magfield_L(m) = w_new_L(6, m) * MHDF(-1)
+       z_magfield_L(m) = w_new_L(7, m) * MHDF(-1)
+
+
+       magf = Create_vector (x_magfield_L(m), y_magfield_L(m), z_magfield_L(m))
+       velc = Create_vector (x_velocity_L(m), y_velocity_L(m), z_velocity_L(m))
+
+       magf_squrd = Dotproduct (magf, magf)
+       velc_squrd = Dotproduct (velc, velc)
+
+       pressure_L(m)   = w_new_L(5, m) + (0.5D0 * magf_squrd * MHDF(2))
+       energy_L(m)     = Calculate_energy_EOS (density_L(m), pressure_L(m), gamma_L(m), velc_squrd, magf_squrd)
+
+
+       density_R(m)    = w_new_R(1, m)
+       x_velocity_R(m) = w_new_R(2, m)
+       y_velocity_R(m) = w_new_R(3, m)
+       z_velocity_R(m) = w_new_R(4, m)
+       x_momentum_R(m) = w_new_R(1, m) * w_new_R(2, m)
+       y_momentum_R(m) = w_new_R(1, m) * w_new_R(3, m)
+       z_momentum_R(m) = w_new_R(1, m) * w_new_R(4, m)
+       gamma_R(m)      = gamma_1D(m+1)
+
+       x_magfield_R(m) = x_magfield_L(m)
+       y_magfield_R(m) = w_new_R(6, m) * MHDF(-1)
+       z_magfield_R(m) = w_new_R(7, m) * MHDF(-1)
+
+
+       magf = Create_vector (x_magfield_R(m), y_magfield_R(m), z_magfield_R(m))
+       velc = Create_vector (x_velocity_R(m), y_velocity_R(m), z_velocity_R(m))
+
+       magf_squrd = Dotproduct (magf, magf)
+       velc_squrd = Dotproduct (velc, velc)
+
+       pressure_R(m)   = w_new_R(5, m) + (0.5D0 * magf_squrd * MHDF(2))
+       energy_R(m)     = Calculate_energy_EOS (density_R(m), pressure_R(m), gamma_R(m), velc_squrd, magf_squrd)
+
+    end do
+
+    return
+
+
+            
+! ----------------------------------------------------------------------------------------------------------------------------------
+  end subroutine Determine_Riemann_input_PPML
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
+! --- FUNCTION: General Minmod Function -------------------------------------------------------------------------------- [REC05] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
   function minmod (x, y)
@@ -945,7 +1246,7 @@ contains
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- SUBROUTINE: Calculate the Eigen-system --------------------------------------------------------------------------- [REC05] ---
+! --- SUBROUTINE: Calculate the Eigen-system --------------------------------------------------------------------------- [REC06] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
   subroutine Calculate_eigensystem ()
@@ -1219,7 +1520,7 @@ contains
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- SUBROUTINE: Deallocate the Input States -------------------------------------------------------------------------- [REC06] ---
+! --- SUBROUTINE: Deallocate the Input States -------------------------------------------------------------------------- [REC07] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
   subroutine Deallocate_input_states ()
@@ -1281,9 +1582,9 @@ contains
     end if
 
 
-    ! Specific for PPM
+    ! Specific for PPM(L)
 
-    if (RECONSTRUCT_TYPE == 'P') then
+    if ((RECONSTRUCT_TYPE == 'P') .or. (RECONSTRUCT_TYPE == 'L')) then
 
        deallocate (wh)
 

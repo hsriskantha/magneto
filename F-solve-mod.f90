@@ -218,7 +218,7 @@ contains
 
     do m =  BOUNDARY, rowsize + BOUNDARY
 
-       ! Method of Miyoshi and Kusano, J. Comput. Phys. 208, 315 (2005) -- eq. (67)
+       ! Method of Miyoshi and Kusano, J. Comput. Phys., 208, 315 (2005) -- eq. (67)
 
        if (WAVESPEED_TYPE == 'M') then
 
@@ -260,7 +260,7 @@ contains
        end if
 
 
-       ! Method of Janhunen, J. Comput. Phys. 160, 649 (2000) -- eq. (27)
+       ! Method of Janhunen, J. Comput. Phys., 160, 649 (2000) -- eq. (27)
 
        if (WAVESPEED_TYPE == 'J') then
 

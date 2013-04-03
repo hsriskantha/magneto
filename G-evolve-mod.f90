@@ -294,8 +294,9 @@ contains
   ! Calculating the inter-cell fluxes.
   ! ----------------------------------
 
-    if (RECONSTRUCT_TYPE == 'T') call Determine_Riemann_input_TVD     ! --> <REC02>
-    if (RECONSTRUCT_TYPE == 'P') call Determine_Riemann_input_PPM     ! --> <REC03>
+    if (RECONSTRUCT_TYPE == 'T') call Determine_Riemann_input_TVD      ! --> <REC02>
+    if (RECONSTRUCT_TYPE == 'P') call Determine_Riemann_input_PPM      ! --> <REC03>
+    if (RECONSTRUCT_TYPE == 'L') call Determine_Riemann_input_PPML     ! --> <REC04>
 
     call Calculate_intercell_fluxes_HLLD ()     ! --> <SOL02>
 

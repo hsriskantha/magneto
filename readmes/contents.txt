@@ -228,13 +228,16 @@ FUNCTIONS AND SUBROUTINES
 - [REC03]: subroutine Determine_Riemann_input_PPM ()
   	   Determine the Input States for the Riemann Problem (using Piecewise Parabolic Method)
 
-- [REC04]: function minmod (x, y)
+- [REC04]: subroutine Determine_Riemann_input_PPML ()
+           Determine the Input States for the Riemann Problem (using Piecewise Parabolic Method with limiter)
+
+- [REC05]: function minmod (x, y)
            General Minmod Function
 
-- [REC05]: subroutine Calculate_eigensystem ()
+- [REC06]: subroutine Calculate_eigensystem ()
            Calculate the Eigen-system
 
-- [REC06]: subroutine Deallocate_input_states ()
+- [REC07]: subroutine Deallocate_input_states ()
            Deallocate the Input States
 
 
