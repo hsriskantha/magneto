@@ -15,7 +15,6 @@
 
 module recon
 
-  use start
   use setup
   use grids
   implicit none

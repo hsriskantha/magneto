@@ -15,7 +15,6 @@
 
 module solve
 
-  use start
   use setup
   use recon
   implicit none

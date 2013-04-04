@@ -24,6 +24,21 @@ module setup
 
 
 
+  ! Settings and initial conditions.
+  ! --------------------------------
+
+  character :: TEST_PROBLEM
+  character :: OUTPUT_TYPE
+  character :: RECONSTRUCT_TYPE
+  character :: WAVESPEED_TYPE
+
+  logical :: VARIABLE_DELTAT
+  logical :: PRINT_DELTAT
+  logical :: PRESSURE_FIX
+  integer :: PRINT_FREQ
+
+
+
   ! Defining time and space.
   ! ------------------------
       ! Note: the values of these variables can be set in the <TESxx> subroutines.
@@ -129,6 +144,66 @@ contains
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
   end function Create_vector7
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
+! --- SUBROUTINE: Load Settings (from start.txt) ----------------------------------------------------------------------- [SET04] ---
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+  subroutine Load_settings ()
+
+
+  ! Declaration of local variables.
+  ! -------------------------------
+
+    character :: heading*130, setting*20
+    integer   :: n
+
+
+
+  ! Opening file and loading header.
+  ! --------------------------------
+
+    open (100, file = "start.txt")
+
+    do n = 1, 11
+       read (100, *) heading
+    end do
+
+
+
+  ! Loading settings.
+  ! -----------------
+
+    read (100, *) setting, TEST_PROBLEM
+    read (100, *) setting, OUTPUT_TYPE
+
+    read (100, *) setting, RECONSTRUCT_TYPE
+    read (100, *) setting, WAVESPEED_TYPE
+
+    read (100, *) setting, VARIABLE_DELTAT
+    read (100, *) setting, PRINT_DELTAT
+    read (100, *) setting, PRESSURE_FIX
+
+    read (100, *) setting, PRINT_FREQ
+
+
+
+  ! Closing file.
+  ! -------------
+
+    close (100)
+
+    return
+
+    
+
+! ----------------------------------------------------------------------------------------------------------------------------------
+  end subroutine Load_settings
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
 

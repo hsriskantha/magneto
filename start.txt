@@ -2,8 +2,8 @@
 ! --- Quarkwood Magneto 8.2 --------------------------------------------------------------------------------------------------------
 ! ----------------------------------------------------------------------------------------------------------------------------------
 !
-!     X: The Start Module
-!     ===================
+!     The Start File
+!     ==============
 !     -- Contains settings and initial conditions.
 !
 ! ----------------------------------------------------------------------------------------------------------------------------------
@@ -11,26 +11,18 @@
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
 
+"TEST_PROBLEM -------", "B"
+"OUTPUT_TYPE --------", "C"
 
-module start
+"RECONSTRUCT_TYPE ---", "P"
+"WAVESPEED_TYPE -----", "J"
 
-  implicit none
+"VARIABLE_DELTAT ----", .true.
+"PRINT_DELTAT -------", .true.
+"PRESSURE_FIX -------", .true.
 
+"PRINT_FREQ ---------", 100
 
-  ! Settings and initial conditions.
-  ! --------------------------------
-
-  character, parameter :: TEST_PROBLEM = 'B'
-  character, parameter :: OUTPUT_TYPE  = 'C'
-
-  character, parameter :: RECONSTRUCT_TYPE = 'C'
-  character, parameter :: WAVESPEED_TYPE   = 'J'
-  
-  logical, parameter :: VARIABLE_DELTAT = .true.
-  logical, parameter :: PRINT_DELTAT    = .true.
-  logical, parameter :: PRESSURE_FIX    = .true.
-
-  integer, parameter :: PRINT_FREQ = 100
 
   ! --------------------------------------------------------------------------------------------------------------------------------
   ! [STA_A] GUIDE: Settings and Initial Conditions
@@ -80,8 +72,4 @@ module start
   !
   !     PRINT_FREQ       - the frequency (in number of iterations) at which output files are written.
   !
-  ! --------------------------------------------------------------------------------------------------------------------------------
-
-
-
-end module start
+  ! -------------------------------------------------------------------------------------------------------------------------------

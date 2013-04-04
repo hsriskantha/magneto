@@ -10,7 +10,6 @@
 
 program magneto
 
-  use start
   use setup
   use fluid
   use tests
@@ -39,6 +38,7 @@ program magneto
   ! Initialising the simulation.
   ! ----------------------------
 
+  call Load_settings ()             ! --> <SET04>
   call Check_initial_errors ()      ! --> <ERR01>
   call Initialise_simulation ()     ! --> <EVO01>
 

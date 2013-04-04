@@ -14,7 +14,6 @@
 
 module error
 
-  use start
   use setup
   implicit none
 
@@ -48,8 +47,8 @@ contains
     
 
 
-  ! Testing input in A_setup_mod
-  ! ----------------------------
+  ! Testing input in start.txt
+  ! --------------------------
 
     ! TEST_PROBLEM
 
@@ -57,8 +56,8 @@ contains
     string_test = verify(TEST_PROBLEM, 'ABCDEFX')
 
     if (string_test > 0) then
-       write (*, *) 'ERROR: Invalid value of TEST_PROBLEM in A-setup-mod'
-       write (*, *) ' --> See <SET_A> for more information.'
+       write (*, *) 'ERROR: Invalid value of TEST_PROBLEM in start.txt'
+       write (*, *) ' --> See <STA_A> for more information.'
        write (*, *) ' '
        error_flag = .true.
     end if
@@ -70,8 +69,8 @@ contains
     string_test = verify(OUTPUT_TYPE, 'ABC')
 
     if (string_test > 0) then
-       write (*, *) 'ERROR: Invalid value of OUTPUT_TYPE in A-setup-mod'
-       write (*, *) ' --> See <SET_A> for more information.'
+       write (*, *) 'ERROR: Invalid value of OUTPUT_TYPE in start.txt'
+       write (*, *) ' --> See <STA_A> for more information.'
        write (*, *) ' '
        error_flag = .true.
     end if
@@ -83,8 +82,8 @@ contains
     string_test = verify(RECONSTRUCT_TYPE, 'TPC')
 
     if (string_test > 0) then
-       write (*, *) 'ERROR: Invalid value of RECONSTRUCT_TYPE in A-setup-mod'
-       write (*, *) ' --> See <SET_A> for more information.'
+       write (*, *) 'ERROR: Invalid value of RECONSTRUCT_TYPE in start.txt'
+       write (*, *) ' --> See <STA_A> for more information.'
        write (*, *) ' '
        error_flag = .true.
     end if
@@ -96,8 +95,8 @@ contains
     string_test = verify(WAVESPEED_TYPE, 'MJ')
 
     if (string_test > 0) then
-       write (*, *) 'ERROR: Invalid value of WAVESPEED_TYPE in A-setup-mod'
-       write (*, *) ' --> See <SET_A> for more information.'
+       write (*, *) 'ERROR: Invalid value of WAVESPEED_TYPE in start.txt'
+       write (*, *) ' --> See <STA_A> for more information.'
        write (*, *) ' '
        error_flag = .true.
     end if
@@ -115,7 +114,7 @@ contains
        inquire(file='./output/restart2.bin', exist = restart_flag2)
 
        if ((restart_flag1 .eqv. .false.) .or. (restart_flag2 .eqv. .false.)) then
-          write (*, *) 'ERROR: You have chosen to use a restart file in A-setup-mod.'
+          write (*, *) 'ERROR: You have chosen to use a restart file in start.txt.'
           write (*, *) 'However, at least one of the restart files cannot be found.'
           write (*, *) 'Make sure restart1.bin and restart2.bin are saved in the'
           write (*, *) 'folder ./output/ or alternatively choose a new test problem.'

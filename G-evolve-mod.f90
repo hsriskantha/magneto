@@ -14,7 +14,6 @@
 
 module evolve
 
-  use start
   use setup
   use fluid
   use tests
@@ -57,7 +56,7 @@ contains
     if (TEST_PROBLEM == 'D') call Set_initial_conditions_D ()     ! --> <TES04>
     if (TEST_PROBLEM == 'E') call Set_initial_conditions_E ()     ! --> <TES05>
     if (TEST_PROBLEM == 'F') call Set_initial_conditions_F ()     ! --> <TES06>
-    if (TEST_PROBLEM == 'X') call Load_restart_file ()            ! --> <TES07>
+    if (TEST_PROBLEM == 'X') call Load_restart_files ()           ! --> <TES07>
 
 
   ! Allocating arrays.
