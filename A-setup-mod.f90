@@ -75,7 +75,6 @@ module setup
   !     VARIABLE_DELTAT  - if 'true', DELTAT will change with time according to the CFL condition, in <FLU07>.
   !                      - if 'false', then DELTAT will be fixed at the value of MAX_DELTAT, set in the <TESxx> subroutines.
   !     PRINT_DELTAT     - if 'true', then DELTAT will be stored at each timestep in 'output/timestep.txt'
-  !     MAG_WAVESPEED    - if 'true', then the magnetic field will be included in the SL/SR estimates in the Riemann solver.
   !     PRESSURE_FIX     - if 'true', then the pressure and energy will be corrected at the end of each timestep, to
   !                      -   compensate for the new, divergence-free maintaining values of the magnetic field. 
   !
