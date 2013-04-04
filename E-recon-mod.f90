@@ -818,6 +818,8 @@ contains
     end do
 
 
+    ! Usual characteristic tracing. 
+
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do p = 1, 7
 
@@ -836,10 +838,7 @@ contains
                 w_new_L(q, m) = w_new_L(q, m) + C * R(q, p, m)
              end do
 
-          end if
-
-
-          if (lambda(p, m) < 0.0D0) then
+          else if (lambda(p, m) < 0.0D0) then
 
              C = 0.0D0
 
@@ -857,7 +856,46 @@ contains
           end if
 
        end do
-    end do     
+    end do    
+
+
+    ! Additional characteristic tracing for approximate Riemann solvers.
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+       do p = 1, 7
+
+          if (lambda(p, m) < 0.0D0) then
+
+             C = 0.0D0
+
+             A = 0.5D0 * dtdx(m) * (lambda(p, m) - lambda(1, m))
+
+             do q = 1, 7
+                C = C + L(p, q, m) * (A * PPM_dw(q, m))
+             end do
+
+             do q = 1, 7
+                w_new_L(q, m) = w_new_L(q, m) - C * R(q, p, m)
+             end do
+
+          else if (lambda(p, m) > 0.0D0) then
+
+             C = 0.0D0
+
+             A = 0.5D0 * dtdx(m) * (lambda(p, m) - lambda(7, m))
+
+             do q = 1, 7
+                C = C + L(p, q, m) * (A * PPM_dw(q, m))
+             end do
+
+             do q = 1, 7
+                w_new_R(q, m-1) = w_new_R(q, m-1) - C * R(q, p, m)
+             end do
+
+          end if
+
+       end do
+    end do   
 
 
 
@@ -1146,6 +1184,8 @@ contains
     end do
 
 
+    ! Usual characteristic tracing
+
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do p = 1, 7
 
@@ -1180,6 +1220,45 @@ contains
 
              do q = 1, 7
                w_new_R(q, m) = w_new_R(q, m) + C * R(q, p, m)
+             end do
+
+          end if
+
+       end do
+    end do   
+
+
+    ! Additional characteristic tracing for approximate Riemann solvers.
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+       do p = 1, 7
+
+          if (lambda(p, m) < 0.0D0) then
+
+             C = 0.0D0
+
+             A = 0.5D0 * dtdx(m) * (lambda(p, m) - lambda(1, m))
+
+             do q = 1, 7
+                C = C + L(p, q, m) * (A * PPM_dw(q, m))
+             end do
+
+             do q = 1, 7
+                w_new_L(q, m) = w_new_L(q, m) - C * R(q, p, m)
+             end do
+
+          else if (lambda(p, m) > 0.0D0) then
+
+             C = 0.0D0
+
+             A = 0.5D0 * dtdx(m) * (lambda(p, m) - lambda(7, m))
+
+             do q = 1, 7
+                C = C + L(p, q, m) * (A * PPM_dw(q, m))
+             end do
+
+             do q = 1, 7
+                w_new_R(q, m-1) = w_new_R(q, m-1) - C * R(q, p, m)
              end do
 
           end if
