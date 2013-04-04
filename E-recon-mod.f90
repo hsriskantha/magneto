@@ -86,7 +86,7 @@ module recon
   real (PREC), dimension(:,:), allocatable :: sigma, dw
 
 
-  ! Specific for PPM(L)
+  ! Specific for PPM(CS)
 
   real (PREC), dimension(:,:), allocatable :: wh
   
@@ -163,9 +163,9 @@ contains
     end if
 
 
-    ! Specific for PPM(L)
+    ! Specific for PPM(CS)
 
-    if ((RECONSTRUCT_TYPE == 'P') .or. (RECONSTRUCT_TYPE == 'L')) then
+    if ((RECONSTRUCT_TYPE == 'P') .or. (RECONSTRUCT_TYPE == 'C')) then
 
        allocate (wh(7, MFULL))
 
@@ -558,7 +558,8 @@ contains
   subroutine Determine_Riemann_input_PPM ()
 
   ! This subroutine uses the PPM algorithm of Collela and Woodward, J. Comput. Phys., 54, 174 (1984)
-  !   --> the characteristic tracing is based on S4.2.3 of Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
+  !   --> and the montonicity adjustments of Colella and Sekora, J. Comput. Phys., 227, 7069 (2008)
+  !   --> while the characteristic tracing is based on S4.2.3 of Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
 
 
   ! Declaration of local variables.
@@ -570,11 +571,14 @@ contains
     logical :: cond1, cond2, cond3, cond4
 
     real (PREC) :: A, B, C
-    real (PREC) :: scratch1, scratch2
+    real (PREC) :: scratch1, scratch2, wlim
 
     integer :: m     ! m is used to label spatial position (i.e. m in [1, MFULL])
     integer :: p     ! p and q are used to label elements of state-based vectors (i.e. with 7 elements).  
     integer :: q     !   Usually, p labels eigenvalues (e.g. p = 1 corresponds to v_x - c_f).
+
+    real (PREC), parameter :: epsilon = 1D-10
+    real (PREC), parameter :: Clim = 1.25D0
 
 
 
@@ -661,7 +665,6 @@ contains
 
   ! Step five: project back onto the primitive variables.
   ! -----------------------------------------------------
-    
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
 
@@ -700,43 +703,67 @@ contains
   ! Step seven: further monotonicity constraints.
   ! ---------------------------------------------
 
-    ! Taken from the Athena (Fortran) source code
+    ! From Colella and Sekora, J. Comput. Phys., 227, 7069 (2008)
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do q = 1, 7
 
-          w_L(q, m) = max(min(w(q, m), w(q, m-1)), w_L(q, m))
-          w_L(q, m) = min(max(w(q, m), w(q, m-1)), w_L(q, m))
-          w_R(q, m) = max(min(w(q, m), w(q, m+1)), w_R(q, m))
-          w_R(q, m) = min(max(w(q, m), w(q, m+1)), w_R(q, m))
+          cond1 = ((w_R(q, m) - w(q, m)) * (w(q, m) - w_L(q, m)) <= 0.0D0)
+          cond2 = ((w(q, m-1) - w(q, m)) * (w(q, m) - w(q, m+1)) <= 0.0D0)
 
-       end do
-    end do
+          if (cond1 .or. cond2) then
+
+             PPM_w6(q, m) = (6.0D0 * w(q, m)) - 3.0D0 * (w_L(q, m) + w_R(q, m))
+
+             daG(q, m) = -2.0D0 * PPM_w6(q, m)
+
+             daC(q, m) = w(q, m-1) - 2.0D0 * w(q, m  ) + w(q, m+1)
+             daL(q, m) = w(q, m-2) - 2.0D0 * w(q, m-1) + w(q, m  )
+             daR(q, m) = w(q, m  ) - 2.0D0 * w(q, m+1) + w(q, m+2)
+
+             cond3 = ((daG(q, m) < 0.0D0) .and. (daC(q, m) < 0.0D0) .and. (daL(q, m) < 0.0D0) .and. (daR(q, m) < 0.0D0))
+             cond4 = ((daG(q, m) > 0.0D0) .and. (daC(q, m) > 0.0D0) .and. (daL(q, m) > 0.0D0) .and. (daR(q, m) > 0.0D0))
+
+             wlim = 0.0D0
+
+             if (cond3 .or. cond4) then
+
+                scratch1 = min(abs(daL(q, m)), abs(daR(q, m)), abs(daC(q, m)))
+
+                wlim = sign(1.0D0, daG(q, m)) * min(Clim * scratch1, abs(daG(q, m)))
+
+             end if
+
+             if (abs(daG(q, m)) < epsilon) then
+
+                w_L(q, m) = w(q, m)
+                w_R(q, m) = w(q, m)
+
+             else
+
+                w_L(q, m) = w(q, m) + (w_L(q, m) - w(q, m)) * (wlim/daG(q, m))
+                w_R(q, m) = w(q, m) + (w_R(q, m) - w(q, m)) * (wlim/daG(q, m))
+                
+             end if
+
+          else
 
 
-    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-       do q = 1, 7
-
-          if (((w_R(q, m) - w(q, m)) * (w(q, m) - w_L(q, m))) <= 0.0D0) then
-
-             w_L(q, m) = w(q, m)
-             w_R(q, m) = w(q, m)
+             scratch1 = (w_R(q, m) - w_L(q, m))
+             scratch2 = (w_R(q, m) + w_L(q, m)) / 2.0D0
              
+             if ((6.0D0 * scratch1) * (w(q, m) - scratch2) > scratch1**2.0D0) then
+                
+                w_L(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_R(q, m))
+                
+             else if ((6.0D0 * scratch1) * (w(q, m) - scratch2) < -(scratch1)**2.0D0) then
+                
+                w_R(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_L(q, m))
+                
+             end if
+
           end if
-          
-          
-          scratch1 = (w_R(q, m) - w_L(q, m))
-          scratch2 = (w_R(q, m) + w_L(q, m)) / 2.0D0
-          
-          if ((6.0D0 * scratch1) * (w(q, m) - scratch2) > scratch1**2.0D0) then
-             
-             w_L(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_R(q, m))
-             
-          else if ((6.0D0 * scratch1) * (w(q, m) - scratch2) < -(scratch1)**2.0D0) then
-             
-             w_R(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_L(q, m))
-             
-          end if
+
 
        end do
     end do
@@ -778,6 +805,8 @@ contains
 
   ! Step ten: the characteristic tracing.
   ! -------------------------------------
+
+    ! From S4.2.3 of Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do q = 1, 7
@@ -899,13 +928,13 @@ contains
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- FUNCTION: Determine the Input States for the Riemann Problem (using Piecewise Parabolic Method with CS limiter)--- [REC04] ---
+! --- FUNCTION: Determine the Input States for the Riemann Problem (using Piecewise Parabolic Method: CS Edition) ------ [REC04] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
-  subroutine Determine_Riemann_input_PPML ()
+  subroutine Determine_Riemann_input_PPMCS ()
 
   ! This subroutine uses the PPM algorithm of Collela and Woodward, J. Comput. Phys., 54, 174 (1984)
-  !   --> ... and the limiter of Colella and Sekora, J. Comput. Phys., 227, 7069 (2008)
+  !   --> ... based on the version described in Colella and Sekora, J. Comput. Phys., 227, 7069 (2008)
 
 
   ! Declaration of local variables.
@@ -935,119 +964,74 @@ contains
 
 
 
-  ! Step two: compute left, right and centred differences.
-  ! ------------------------------------------------------
+  ! Step two: interpolating value at cell faces.
+  ! --------------------------------------------
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do q = 1, 7
 
-          dwG(q, m) = 0.0D0
-
-          dwL(q, m) =  w(q, m  ) - w(q, m-1)
-          dwR(q, m) =  w(q, m+1) - w(q, m  )
-          dwC(q, m) = (w(q, m+1) - w(q, m-1))/2.0D0
-
-          if ((dwL(q, m) * dwR(q, m)) > 0.0D0) then 
-             dwG(q, m) = 2.0D0 * dwL(q, m) * dwR(q, m) / (dwL(q, m) + dwR(q, m))
-          end if
+          wh(q, m) = (37.0D0/60.0D0) * (w(q, m  ) + w(q, m+1)) &
+                   - ( 2.0D0/15.0D0) * (w(q, m-1) + w(q, m+2)) &
+                   + ( 1.0D0/60.0D0) * (w(q, m-2) + w(q, m+3))
 
        end do
     end do
 
 
 
-  ! Step three: project differences onto characteristic variables.
-  ! --------------------------------------------------------------
+  ! Step three: limiting this value.
+  ! --------------------------------
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-    
        do q = 1, 7
 
-          daL(q, m) = 0.0D0
-          daR(q, m) = 0.0D0
-          daC(q, m) = 0.0D0
+          daC(q, m) = 3.0D0 * (w(q, m  ) - 2.0D0 * wh(q, m  ) + w(q, m+1))
+          daL(q, m) =         (w(q, m-1) - 2.0D0 *  w(q, m  ) + w(q, m+1))
+          daR(q, m) =         (w(q, m  ) - 2.0D0 *  w(q, m+1) + w(q, m+2))
+
+       end do
+    end do
+
+    
+    do m = BOUNDARY,  (BOUNDARY + rowsize) + 1
+       do q = 1, 7
+          
           daG(q, m) = 0.0D0
-
-       end do
-
-       do q = 1, 7
-          do p = 1, 7
-
-             daL(p, m) = daL(p, m) + (L(p, q, m) * dwL(q, m))
-             daR(p, m) = daR(p, m) + (L(p, q, m) * dwR(q, m))
-             daC(p, m) = daC(p, m) + (L(p, q, m) * dwC(q, m))
-             daG(p, m) = daG(p, m) + (L(p, q, m) * dwG(q, m))
-
-          end do
-       end do
-
-    end do
-
-
-
-  ! Step four: apply monotonicity constraints.
-  ! ------------------------------------------
-
-    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-       do q = 1, 7
-
-          delta_a(q, m) = 0.0D0
-
-          if ((daL(q, m) * daR(q, m)) >= 0.0D0) then
-
-             scratch1 = min(abs(daL(q, m)), abs(daR(q, m)))
-             scratch2 = min(abs(daC(q, m)), abs(daG(q, m)))
-
-             scratch2 = abs(daC(q, m))
+          
+          cond1 = ((daC(q, m) > 0.0D0) .and. (daL(q, m) > 0.0D0) .and. (daR(q, m) > 0.0D0))
+          cond2 = ((daC(q, m) < 0.0D0) .and. (daL(q, m) < 0.0D0) .and. (daR(q, m) < 0.0D0))
+          
+          if (cond1 .or. cond2) then
              
-             delta_a(q, m) = sign(1.0D0, daC(q, m)) * min(2.0D0 * scratch1, scratch2)
-
+             scratch1 = min(abs(daL(q, m)), abs(daR(q, m)))
+             
+             daG(q, m) = sign(1.0D0, daC(q, m)) * min(Clim * scratch1, abs(daC(q, m)))
+             
           end if
+          
+          wh(q, m) = (0.5D0 * (w(q, m) + w(q, m+1))) + (daG(q, m)/3.0D0)
 
        end do
     end do
 
 
 
-  ! Step five: project back onto the primitive variables.
-  ! -----------------------------------------------------
-    
-    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-
-       do q = 1, 7
-
-          delta_w(q, m) = 0.0D0
-
-       end do
-
-       do q = 1, 7
-          do p = 1, 7
-
-             delta_w(p, m) = delta_w(p, m) + (delta_a(q, m) * R(p, q, m))
-
-          end do
-       end do
-
-    end do
-
-
-
-  ! Step six: parabolic interpolation.
-  ! ----------------------------------
+  ! Step four: constructing the left and right values.
+  ! --------------------------------------------------
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do q = 1, 7
 
-          w_L(q, m) = ((w(q, m  ) + w(q, m-1))/2.0D0) - ((delta_w(q, m  ) - delta_w(q, m-1))/6.0D0)
-          w_R(q, m) = ((w(q, m+1) + w(q, m  ))/2.0D0) - ((delta_w(q, m+1) - delta_w(q, m  ))/6.0D0)
+          w_L(q, m) = wh(q, m-1)
+          w_R(q, m) = wh(q, m)
 
        end do
     end do
 
 
 
-  ! Step seven: further monotonicity constraints.
-  ! ---------------------------------------------
+  ! Step five: further monotonicity constraints.
+  ! --------------------------------------------
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do q = 1, 7
@@ -1114,8 +1098,8 @@ contains
 
 
 
-  ! Step eight: compute PPM coefficients.
-  ! -------------------------------------
+  ! Step six: compute PPM coefficients.
+  ! -----------------------------------
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do q = 1, 7
@@ -1128,8 +1112,8 @@ contains
 
 
 
-  ! Step nine: compute the left and right interface values.
-  ! -------------------------------------------------------
+  ! Step seven: compute the left and right interface values.
+  ! --------------------------------------------------------
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
 
@@ -1147,8 +1131,10 @@ contains
 
 
 
-  ! Step ten: the characteristic tracing.
-  ! -------------------------------------
+  ! Step eight: the characteristic tracing.
+  ! ---------------------------------------
+
+    ! From S4.2.3 of Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do q = 1, 7
@@ -1203,8 +1189,8 @@ contains
 
 
 
-  ! Step eleven: the final left and right states.
-  ! ---------------------------------------------                              
+  ! Step nine: the final left and right states.
+  ! -------------------------------------------                              
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
 
@@ -1262,7 +1248,7 @@ contains
 
             
 ! ----------------------------------------------------------------------------------------------------------------------------------
-  end subroutine Determine_Riemann_input_PPML
+  end subroutine Determine_Riemann_input_PPMCS
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -1635,9 +1621,9 @@ contains
     end if
 
 
-    ! Specific for PPM(L)
+    ! Specific for PPM(CS)
 
-    if ((RECONSTRUCT_TYPE == 'P') .or. (RECONSTRUCT_TYPE == 'L')) then
+    if ((RECONSTRUCT_TYPE == 'P') .or. (RECONSTRUCT_TYPE == 'C')) then
 
        deallocate (wh)
 

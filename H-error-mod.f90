@@ -79,7 +79,7 @@ contains
     ! RECONSTRUCT_TYPE
 
     string_test = 0
-    string_test = verify(RECONSTRUCT_TYPE, 'TPL')
+    string_test = verify(RECONSTRUCT_TYPE, 'TPC')
 
     if (string_test > 0) then
        write (*, *) 'ERROR: Invalid value of RECONSTRUCT_TYPE in A-setup-mod'
