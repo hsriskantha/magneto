@@ -14,6 +14,7 @@
 
 module evolve
 
+  use start
   use setup
   use fluid
   use tests

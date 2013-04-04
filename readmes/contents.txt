@@ -19,18 +19,24 @@
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
 
-A: The Setup Module
+X: The Start Module
 ===================
--- Contains initial settings and some basic functions.
+-- Contains settings and initial conditions.
 
 
 GUIDES
-------
+-------
 
-- [SET_A]: Settings and Initial Conditions
-- [SET_B]: Boundary Conditions
-- [SET_C]: Magnetohydrodynamics Units
+- [STA_A]: Settings and Initial Conditions
 
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+
+A: The Setup Module
+===================
+-- Contains parameters and some basic functions.
 
 
 FUNCTIONS AND SUBROUTINES
@@ -117,7 +123,9 @@ C: The Tests Module
 GUIDES
 ------
 
-- [TES_A]: More Test Cases...
+- [TES_A]: Boundary Conditions
+- [TES_B]: Magnetohydrodynamic Units
+- [TES_C]: More Test Cases...
 
 
 

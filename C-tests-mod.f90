@@ -14,20 +14,41 @@
 
 module tests
 
-  use setup
-  use fluid
-  implicit none
-
-contains
+  ! --------------------------------------------------------------------------------------------------------------------------------
+  ! [TES_A] Guide: Boundary Conditions             
+  ! --------------------------------------------------------------------------------------------------------------------------------
+  !   When setting initial conditions, the BOUNDTYPE flag below determines the boundary conditions.
+  !
+  !     Set BOUNDTYPE = 1 for EXTENDED boundaries, i.e. ---123 ... 789---  >>  111123 ... 789999
+  !     Set BOUNDTYPE = 2 for PERIODIC boundaries, i.e. ---123 ... 789---  >>  789123 ... 789123
+  ! --------------------------------------------------------------------------------------------------------------------------------
 
   ! --------------------------------------------------------------------------------------------------------------------------------
-  ! [TES_A] GUIDE: More Test Cases...              
+  ! [TES_B] Guide: Magnetohydrodynamic Units       
+  ! --------------------------------------------------------------------------------------------------------------------------------
+  !   When setting initial conditions, the MHDUNITS flag below determines what units are used for the magnetic field.
+  !
+  !     Set MHDUNITS = 1 so that MHDF(1) returns 1.0D0 / dsqrt(4.0D0 * PI). Used for CGS units.
+  !     Set MHDUNITS = 2 so that MHDF(1) returns 1.0D0. Used for SI units.
+  !
+  !   A more detailed explanation is given in readmes/equations.pdf, S1.1
+  ! --------------------------------------------------------------------------------------------------------------------------------
+
+  ! --------------------------------------------------------------------------------------------------------------------------------
+  ! [TES_C] GUIDE: More Test Cases...              
   ! --------------------------------------------------------------------------------------------------------------------------------
   !   A comphrensive selection of tests can be found on the ATHENA code website:
   !     Standard (C): http://www.astro.princeton.edu/~jstone/Athena/tests/index.html
   !     Fortran:      http://www.astro.virginia.edu/VITA/ATHENA/athena_testsuite.html
   !   ...from which several of these tests have been taken. 
   ! --------------------------------------------------------------------------------------------------------------------------------
+
+
+  use setup
+  use fluid
+  implicit none
+
+contains
 
 
 
@@ -71,7 +92,7 @@ contains
     YDOMN = 1.0D0 * (real(YSIZE) / real(XSIZE))
     ZDOMN = 1.0D0 * (real(ZSIZE) / real(XSIZE))
 
-    MHDUNITS = 2     ! see <SET_C>
+    MHDUNITS = 2     ! see <TES_B>
 
     XZERO = 0.4D0
 
@@ -168,7 +189,7 @@ contains
   ! Set the boundary conditions.
   ! ----------------------------
 
-    BOUNDTYPE = 1     ! see <SET_B>
+    BOUNDTYPE = 1     ! see <TES_A>
 
     return
     
@@ -228,7 +249,7 @@ contains
     YDOMN = 1.0D0 / sin(alpha)           
     ZDOMN = 1.0D0 * (real(ZSIZE) / real(XSIZE))
 
-    MHDUNITS = 2     ! see <SET_C>
+    MHDUNITS = 2     ! see <TES_B>
 
 
 
@@ -318,7 +339,7 @@ contains
   ! Set the boundary conditions.
   ! ----------------------------
 
-    BOUNDTYPE = 2     ! see <SET_B>
+    BOUNDTYPE = 2     ! see <TES_A>
 
 
 
@@ -383,7 +404,7 @@ contains
     YDOMN = 1.5D0
     ZDOMN = 1.0D0 * (real(ZSIZE) / real(XSIZE))
 
-    MHDUNITS = 1     ! see <SET_C>
+    MHDUNITS = 1     ! see <TES_B>
 
 
 
@@ -451,7 +472,7 @@ contains
   ! Set the boundary conditions.
   ! ----------------------------
 
-    BOUNDTYPE = 2     ! see <SET_B>
+    BOUNDTYPE = 2     ! see <TES_A>
 
     return
     
@@ -505,7 +526,7 @@ contains
     YDOMN = 1.0D0
     ZDOMN = 1.0D0 * (real(ZSIZE) / real(XSIZE))
 
-    MHDUNITS = 1     ! see <SET_C> 
+    MHDUNITS = 1     ! see <TES_B> 
 
 
 
@@ -570,7 +591,7 @@ contains
   ! Set the boundary conditions.
   ! ----------------------------
 
-    BOUNDTYPE = 2     ! see <SET_B>
+    BOUNDTYPE = 2     ! see <TES_A>
 
     return
     
@@ -628,7 +649,7 @@ contains
     YDOMN = 1.0D0
     ZDOMN = 1.0D0 * (real(ZSIZE) / real(XSIZE))
 
-    MHDUNITS = 1     ! see <SET_C>
+    MHDUNITS = 1     ! see <TES_B>
 
 
 
@@ -721,7 +742,7 @@ contains
   ! Set the boundary conditions.
   ! ----------------------------
 
-    BOUNDTYPE = 2     ! see <SET_B>
+    BOUNDTYPE = 2     ! see <TES_A>
 
     return
     
@@ -774,7 +795,7 @@ contains
     YDOMN = 1.0D0
     ZDOMN = 1.0D0 * (real(ZSIZE) / real(XSIZE))
 
-    MHDUNITS = 1     ! see <SET_C>             
+    MHDUNITS = 1     ! see <TES_B>             
 
 
 
@@ -844,7 +865,7 @@ contains
   ! Set the boundary conditions.
   ! ----------------------------
 
-    BOUNDTYPE = 2     ! see <SET_B>
+    BOUNDTYPE = 2     ! see <TES_A>
 
     return
 

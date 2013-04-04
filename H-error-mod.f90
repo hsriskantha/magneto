@@ -14,6 +14,7 @@
 
 module error
 
+  use start
   use setup
   implicit none
 

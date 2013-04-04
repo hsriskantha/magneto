@@ -10,6 +10,7 @@
 
 program magneto
 
+  use start
   use setup
   use fluid
   use tests
