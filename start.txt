@@ -20,6 +20,7 @@
 "VARIABLE_DELTAT ----", .true.
 "PRINT_DELTAT -------", .true.
 "PRESSURE_FIX -------", .true.
+"DEBUG_MODE ---------", .true.
 
 "PRINT_FREQ ---------", 100
 
@@ -69,6 +70,7 @@
   !     PRINT_DELTAT     - if 'true', then DELTAT will be stored at each timestep in 'output/timestep.txt'
   !     PRESSURE_FIX     - if 'true', then the pressure and energy will be corrected at the end of each timestep, to
   !                      -   compensate for the new, divergence-free maintaining values of the magnetic field. 
+  !     DEBUG_MODE       - if 'true', then program will produce additional output for debugging purposes.
   !
   !     PRINT_FREQ       - the frequency (in number of iterations) at which output files are written.
   !

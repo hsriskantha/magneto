@@ -165,10 +165,6 @@ contains
 
 
 
-    real (PREC) :: pbl, pbr, gpl, gpr, gpbl, gpbr, cfmax, Bxsq
-
-
-
 ! --- PART ONE: Preliminary Calculations -------------------------------------------------------------------------------------------
 
 
@@ -257,6 +253,17 @@ contains
           SL(m) = min(x_velocity_L(m), x_velocity_R(m)) - max(cfL, cfR)
           SR(m) = max(x_velocity_L(m), x_velocity_R(m)) + max(cfL, cfR)
 
+          
+          ! DEBUG MODE: Checking the CFL stability condition
+
+          if (DEBUG_MODE) then
+
+             scratch = (max(abs(SL(m)), abs(SR(m))) * dt(m)) / dx(m)
+
+             if (scratch > COURANT) CFL_violations = CFL_violations + 1
+
+          end if
+
        end if
 
 
@@ -281,6 +288,17 @@ contains
 
           SL(m) = min(x_velocity_L(m), x_velocity_R(m)) - sqrt(s2)
           SR(m) = max(x_velocity_L(m), x_velocity_R(m)) + sqrt(s2)
+
+
+          ! DEBUG MODE: Checking the CFL stability condition
+
+          if (DEBUG_MODE) then
+
+             scratch = (max(abs(SL(m)), abs(SR(m))) * dt(m)) / dx(m)
+
+             if (scratch > COURANT) CFL_violations = CFL_violations + 1
+
+          end if
        
        end if
           

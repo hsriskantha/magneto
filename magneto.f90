@@ -157,6 +157,17 @@ program magneto
 
 
 
+  ! DEBUG MODE: Printing additional information.
+  ! --------------------------------------------
+
+  if (DEBUG_MODE) then
+
+     write(*, '(a, i1)') 'Number of CFL violations: ', CFL_violations
+
+  end if
+
+
+
   ! Shutting down simulation.
   ! -------------------------
 

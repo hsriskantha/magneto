@@ -35,6 +35,8 @@ module setup
   logical :: VARIABLE_DELTAT
   logical :: PRINT_DELTAT
   logical :: PRESSURE_FIX
+  logical :: DEBUG_MODE
+
   integer :: PRINT_FREQ
 
 
@@ -80,6 +82,13 @@ module setup
 
   real (PREC), parameter :: PI = 3.141592653589793
   real (PREC) :: alpha     ! Used for circularly-polarised Alfven waves.
+
+
+
+  ! Variables for Debug Mode.
+  ! -------------------------
+  
+  integer :: CFL_violations = 0
 
 contains
 
@@ -188,6 +197,7 @@ contains
     read (100, *) setting, VARIABLE_DELTAT
     read (100, *) setting, PRINT_DELTAT
     read (100, *) setting, PRESSURE_FIX
+    read (100, *) setting, DEBUG_MODE
 
     read (100, *) setting, PRINT_FREQ
 

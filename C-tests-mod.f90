@@ -230,7 +230,7 @@ contains
   ! Time and space.
   ! ---------------
 
-    DELTAT   = 0.0001D0                  
+    DELTAT   = 0.01D0                  
     FULLTIME = 1.0D0        
 
     COURANT    = 0.25D0
@@ -240,7 +240,7 @@ contains
     BOUNDARY   = 4
 
     XSIZE = 24     
-    YSIZE = 24    
+    YSIZE = 24   
     ZSIZE = 1    
 
     alpha = PI / 6.0D0   
@@ -281,7 +281,7 @@ contains
           x = (real(i) - 0.5D0) * DELTAX
           y = (real(j) - 0.5D0) * DELTAY
 
-          v_prll(i, j) = 0.0D0
+          v_prll(i, j) = 1.0D0
           v_perp(i, j) = 0.1 * sin(2.0D0 * PI * (x * cos(alpha) + y * sin(alpha)))
           B_prll(i, j) = 1.0D0
           B_perp(i, j) = v_perp(i, j)
