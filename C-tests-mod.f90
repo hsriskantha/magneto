@@ -79,7 +79,7 @@ contains
     FULLTIME = 0.1D0
 
     COURANT    = 0.25D0
-    MAX_DELTAT = 0.001D0
+    MAX_DELTAT = 0.01D0
 
     DIMENSIONS = 1
     BOUNDARY   = 4

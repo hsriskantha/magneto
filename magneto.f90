@@ -117,7 +117,6 @@ program magneto
 
         ! Evolving the grid
         
-        DELTAT = MAX_DELTAT
         call Evolve_grid ()     ! --> <EVO02>
         
         

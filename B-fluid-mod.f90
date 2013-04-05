@@ -73,7 +73,7 @@ contains
     ZFULL = (2 * BOUNDARY) + ZSIZE
 
     NTIME  = BASE_NTIME
-    NSTEPS = ceiling(FULLTIME/MAX_DELTAT)
+    NSTEPS = ceiling(FULLTIME/DELTAT)
 
     MSIZE = max(XSIZE, YSIZE, ZSIZE)
     MFULL = max(XFULL, YFULL, ZFULL)
