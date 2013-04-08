@@ -162,7 +162,7 @@ program magneto
 
   if (DEBUG_MODE) then
 
-     write(*, '(a, i1)') 'Number of CFL violations: ', CFL_violations
+     write(*, '(a, i5.5)') 'Number of CFL violations: ', CFL_violations
 
   end if
 
