@@ -331,3 +331,6 @@ FUNCTIONS AND SUBROUTINES
 
 - [ERR01]: subroutine Check_initial_errors ()
            Check for Initial Errors
+
+- [ERR02]: subroutine Check_test_errors ()
+           Check for Errors in the Test Subroutines

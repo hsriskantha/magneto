@@ -41,6 +41,7 @@ program magneto
   call Load_settings ()             ! --> <SET04>
   call Check_initial_errors ()      ! --> <ERR01>
   call Initialise_simulation ()     ! --> <EVO01>
+  call Check_test_errors ()         ! --> <ERR02>
 
   if (OUTPUT_TYPE == 'A') call Output_data_A (-1, 1, 1, BASE_FILE_NO)     ! --> <FLU08>
   if (OUTPUT_TYPE == 'B') call Output_data_B (BASE_FILE_NO)               ! --> <FLU09>

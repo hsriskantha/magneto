@@ -53,7 +53,7 @@ module setup
 
   integer     :: DIMENSIONS     ! number of dimensions modelled
 
-  integer     :: BOUNDARY      ! number of boundary points (at each end)
+  integer     :: BOUNDARY      ! number of boundary cells (at each end)
   integer     :: BOUNDTYPE     ! the boundary type
 
   integer :: MHDUNITS     ! the MHD units

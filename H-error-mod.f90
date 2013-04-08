@@ -103,8 +103,6 @@ contains
 
 
 
-
-
   ! Testing presence of restart file.
   ! ---------------------------------
 
@@ -137,6 +135,56 @@ contains
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
   end subroutine Check_initial_errors
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
+! --- SUBROUTINE: Check for Errors in the Test Subroutines ------------------------------------------------------------- [ERR02] ---
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+  subroutine Check_test_errors ()      
+
+
+  ! Declaration of local variables.
+  ! -------------------------------
+
+    logical :: error_flag = .false.
+
+
+
+  ! Testing boundary cells.
+  ! -----------------------
+
+    if (RECONSTRUCT_TYPE == 'C') then
+
+       if (BOUNDARY < 4) then
+
+          write (*, *) 'ERROR: Need at least four boundary cells if using the PPM'
+          write (*, *) '(CS Edition) reconstruction. Adjust the variable BOUNDARY'
+          write (*, *) 'in the appropriate <TESxx> subroutine.'
+          write (*, *) ' '
+          error_flag = .true.
+
+       end if
+
+    end if
+ 
+
+
+  ! Terminating program.
+  ! --------------------
+
+    if (error_flag) stop
+
+    return
+     
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
+  end subroutine Check_test_errors
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
 
