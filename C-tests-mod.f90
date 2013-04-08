@@ -230,8 +230,8 @@ contains
   ! Time and space.
   ! ---------------
 
-    DELTAT   = 0.01D0                  
-    FULLTIME = 1.0D0        
+    DELTAT   = 0.001D0                  
+    FULLTIME = 5.0D0        
 
     COURANT    = 0.25D0
     MAX_DELTAT = 0.01D0    
@@ -239,8 +239,8 @@ contains
     DIMENSIONS = 2
     BOUNDARY   = 4
 
-    XSIZE = 24     
-    YSIZE = 24   
+    XSIZE = 32     
+    YSIZE = 32   
     ZSIZE = 1    
 
     alpha = PI / 6.0D0   

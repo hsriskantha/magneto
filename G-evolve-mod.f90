@@ -140,7 +140,7 @@ contains
 
     call Evolve_x_direction ()
 
-    if (DIMENSIONS > 1) call Initialise_magnetic_field_arrays ()
+    if (DIMENSIONS > 1) call Finish_magnetic_field_evolution ()     ! --> <EVO07>
 
     return
 
