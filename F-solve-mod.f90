@@ -39,10 +39,6 @@ module solve
   ! ------------------
 
   real (PREC), dimension(:,:), allocatable :: flux_L, flux_R
-
-  real (PREC), dimension(:), allocatable :: xvel_roeav, yvel_roeav, zvel_roeav
-  real (PREC), dimension(:), allocatable :: enthalpy_L, enthalpy_R, enth_roeav
-  real (PREC), dimension(:), allocatable :: gmma_roeav, speed_squrd, sound_speed
   
   real (PREC), dimension(:), allocatable :: SL, SR, SM, SLS, SRS
   
@@ -96,10 +92,6 @@ contains
   ! ---------------------------------
 
     allocate (flux_L(MFULL, 8)); allocate (flux_R(MFULL, 8))
-
-    allocate (xvel_roeav(MFULL)); allocate (yvel_roeav(MFULL));  allocate (zvel_roeav(MFULL))
-    allocate (enthalpy_L(MFULL)); allocate (enthalpy_R(MFULL));  allocate (enth_roeav(MFULL))
-    allocate (gmma_roeav(MFULL)); allocate (speed_squrd(MFULL)); allocate (sound_speed(MFULL))
 
     allocate (SL(MFULL));  allocate (SR(MFULL));  allocate (SM(MFULL))
     allocate (SLS(MFULL)); allocate (SRS(MFULL))
@@ -740,10 +732,6 @@ contains
   ! -----------------------------------
 
     deallocate (flux_L); deallocate (flux_R)
-
-    deallocate (xvel_roeav); deallocate (yvel_roeav);  deallocate (zvel_roeav)
-    deallocate (enthalpy_L); deallocate (enthalpy_R);  deallocate (enth_roeav)
-    deallocate (gmma_roeav); deallocate (speed_squrd); deallocate (sound_speed)
 
     deallocate (SL);  deallocate (SR);  deallocate (SM)
     deallocate (SLS); deallocate (SRS);
