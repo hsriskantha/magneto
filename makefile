@@ -18,8 +18,15 @@
 # ----------------------------------------------------------------------------------------------------------------------------------
 
 
-# COMPILER OPTIONS
-# ----------------
+# COMPILER
+# --------
+
+  COMPILER = gfortran
+
+
+# DEBUGGING OPTIONS
+# -----------------
+#   Uncomment just one of these options...
 
 # GDB with traps for floating point exceptions
 # OPTS = -g -ffpe-trap=invalid,overflow -fbounds-check
@@ -37,8 +44,8 @@
 
 # ----------------------------------------------------------------------------------------------------------------------------------
 
-OBJS 	= ./objects/
-FFLAGS 	= -I$(OBJS) -J$(OBJS) $(OPTS)
+OBJS 	 = ./objects/
+FFLAGS 	 = -I$(OBJS) -J$(OBJS) $(OPTS)
 
 
 
@@ -46,7 +53,7 @@ MAGNETO:	$(OBJS)A.o $(OBJS)B.o  $(OBJS)C.o  $(OBJS)D.o	\
                 $(OBJS)E.o $(OBJS)F.o  $(OBJS)G.o  $(OBJS)H.o	\
 		magneto.f90
 
-		gfortran $(FFLAGS) -o MAGNETO			\
+		$(COMPILER) $(FFLAGS) -o MAGNETO			\
                 $(OBJS)A.o $(OBJS)B.o  $(OBJS)C.o  $(OBJS)D.o	\
 		$(OBJS)E.o $(OBJS)F.o  $(OBJS)G.o  $(OBJS)H.o	\
 		magneto.f90
@@ -54,42 +61,42 @@ MAGNETO:	$(OBJS)A.o $(OBJS)B.o  $(OBJS)C.o  $(OBJS)D.o	\
 
 
 $(OBJS)H.o:	H-error-mod.f90 $(OBJS)A.o
-		gfortran $(FFLAGS) -c -o $(OBJS)H.o		\
+		$(COMPILER) $(FFLAGS) -c -o $(OBJS)H.o		\
 		H-error-mod.f90 
 
 $(OBJS)G.o:	G-evolve-mod.f90 $(OBJS)A.o $(OBJS)B.o 		\
 		$(OBJS)C.o $(OBJS)D.o $(OBJS)E.o $(OBJS)F.o
-		gfortran $(FFLAGS) -c -o $(OBJS)G.o		\
+		$(COMPILER) $(FFLAGS) -c -o $(OBJS)G.o		\
 		G-evolve-mod.f90	
 
 $(OBJS)F.o:	F-solve-mod.f90 $(OBJS)A.o $(OBJS)E.o
-		gfortran $(FFLAGS) -c -o $(OBJS)F.o		\
+		$(COMPILER) $(FFLAGS) -c -o $(OBJS)F.o		\
 		F-solve-mod.f90	
 
 $(OBJS)E.o:	E-recon-mod.f90 $(OBJS)A.o $(OBJS)D.o
-		gfortran $(FFLAGS) -c -o $(OBJS)E.o		\
+		$(COMPILER) $(FFLAGS) -c -o $(OBJS)E.o		\
 		E-recon-mod.f90	
 
 $(OBJS)D.o:	D-grids-mod.f90 $(OBJS)A.o $(OBJS)B.o 			
-		gfortran $(FFLAGS) -c -o $(OBJS)D.o		\
+		$(COMPILER) $(FFLAGS) -c -o $(OBJS)D.o		\
 		D-grids-mod.f90	
 
 $(OBJS)C.o:	C-tests-mod.f90 $(OBJS)A.o $(OBJS)B.o			
-		gfortran $(FFLAGS) -c -o $(OBJS)C.o		\
+		$(COMPILER) $(FFLAGS) -c -o $(OBJS)C.o		\
 		C-tests-mod.f90
 
 $(OBJS)B.o:	B-fluid-mod.f90 $(OBJS)A.o			
-		gfortran $(FFLAGS) -c -o $(OBJS)B.o		\
+		$(COMPILER) $(FFLAGS) -c -o $(OBJS)B.o		\
 		B-fluid-mod.f90
 
 $(OBJS)A.o:	A-setup-mod.f90
-		gfortran $(FFLAGS) -c -o $(OBJS)A.o		\
+		$(COMPILER) $(FFLAGS) -c -o $(OBJS)A.o		\
 		A-setup-mod.f90
 
 
 
 clean:
-		rm -f *~
+		rm -f *~ $(OBJS)*
 
 fullclean:
 		rm -f *~ $(OBJS)* ./output/* MAGNETO
