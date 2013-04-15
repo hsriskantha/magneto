@@ -19,6 +19,8 @@
 !     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 !   
 !     A copy of the GNU General Public License can be found in the folder 'readmes', or at <http://www.gnu.org/licenses/>.
+!
+!     The development of this software was supported by the Engineering and Physical Sciences Research Council (UK). 
 !                                  
 ! ----------------------------------------------------------------------------------------------------------------------------------
 ! --- This code is best viewed with a window at least 135 characters wide. ---------------------------------------------------------

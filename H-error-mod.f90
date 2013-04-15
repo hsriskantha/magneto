@@ -19,6 +19,8 @@
 !   
 !     A copy of the GNU General Public License can be found in the folder 'readmes', or at <http://www.gnu.org/licenses/>.
 !
+!     The development of this software was supported by the Engineering and Physical Sciences Research Council (UK). 
+!
 ! ----------------------------------------------------------------------------------------------------------------------------------
 ! --- This code is best viewed in a window at least 135 characters wide. -----------------------------------------------------------
 ! ----------------------------------------------------------------------------------------------------------------------------------
