@@ -41,6 +41,9 @@
   ! --------------------------------------------------------------------------------------------------------------------------------
   ! [STA_A] GUIDE: Settings and Initial Conditions
   ! --------------------------------------------------------------------------------------------------------------------------------
+  !
+  !   For more information on how to run this software, see 'readmes/quickstart.txt'.
+  !
   !   Here are all the main options for the program.
   !
   !     TEST_PROBLEM :: This setting determines the initial conditions. The options are:
