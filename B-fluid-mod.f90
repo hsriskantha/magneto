@@ -8,6 +8,19 @@
 !     -- Main actions: EOS calculations; determine fluid properties; output data to file.
 !
 ! ----------------------------------------------------------------------------------------------------------------------------------
+!
+!     Copyright 2012, 2013 Hari Sriskantha.
+!     This file is part of Magneto.
+!
+!     Magneto is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as
+!     published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!
+!     Magneto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+!     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+!   
+!     A copy of the GNU General Public License can be found in the folder 'readmes', or at <http://www.gnu.org/licenses/>.
+!
+! ----------------------------------------------------------------------------------------------------------------------------------
 ! --- This code is best viewed with a window at least 135 characters wide. ---------------------------------------------------------
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
@@ -135,6 +148,7 @@ contains
 
     ! Note: this function expects the total pressure (gas + magnetic). 
 
+
     real (PREC), intent (in) :: dens_val, pres_val, gamma_val, velc_squrd, magf_squrd
     real (PREC)              :: Calculate_energy_EOS, scratch1, scratch2, scratch3
 
@@ -158,6 +172,7 @@ contains
   function Calculate_pressure_EOS (dens_val, ergy_val, gamma_val, velc_squrd, magf_squrd)
 
     ! Note: this function returns the total pressure (gas + magnetic). 
+
 
     real (PREC), intent (in) :: dens_val, ergy_val, gamma_val, velc_squrd, magf_squrd
     real (PREC)              :: Calculate_pressure_EOS, scratch1, scratch2, scratch3
@@ -223,11 +238,12 @@ contains
 
   function MHDF (power)
 
-    integer, intent (in) :: power
-    real (PREC) :: MHDF
-
     ! Note: see <SET_C> for explanation of how this works. The value of
     !   MHDUNITS is set with the initial conditions in the <TESxx> subroutines.
+
+
+    integer, intent (in) :: power
+    real (PREC) :: MHDF
 
     if (MHDUNITS == 1) then
 
@@ -255,6 +271,8 @@ contains
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
   subroutine Determine_timestep ()
+
+    ! This subroutine was based on S6.1 of Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
 
 
   ! Declaration of local variables.

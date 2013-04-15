@@ -7,6 +7,19 @@
 !     -- Main actions: define initial conditions.
 !
 ! ----------------------------------------------------------------------------------------------------------------------------------
+!
+!     Copyright 2012, 2013 Hari Sriskantha.
+!     This file is part of Magneto.
+!
+!     Magneto is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as
+!     published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!
+!     Magneto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+!     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+!   
+!     A copy of the GNU General Public License can be found in the folder 'readmes', or at <http://www.gnu.org/licenses/>.
+!
+! ----------------------------------------------------------------------------------------------------------------------------------
 ! --- This code is best viewed with a window at least 135 characters wide. ---------------------------------------------------------
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
@@ -30,8 +43,6 @@ module tests
   !
   !     Set MHDUNITS = 1 so that MHDF(1) returns 1.0D0 / dsqrt(4.0D0 * PI). Used for CGS units.
   !     Set MHDUNITS = 2 so that MHDF(1) returns 1.0D0. Used for SI units.
-  !
-  !   A more detailed explanation is given in readmes/equations.pdf, S1.1
   ! --------------------------------------------------------------------------------------------------------------------------------
 
   ! --------------------------------------------------------------------------------------------------------------------------------
@@ -281,7 +292,7 @@ contains
           x = (real(i) - 0.5D0) * DELTAX
           y = (real(j) - 0.5D0) * DELTAY
 
-          v_prll(i, j) = 1.0D0
+          v_prll(i, j) = 0.0D0
           v_perp(i, j) = 0.1 * sin(2.0D0 * PI * (x * cos(alpha) + y * sin(alpha)))
           B_prll(i, j) = 1.0D0
           B_perp(i, j) = v_perp(i, j)
@@ -518,8 +529,8 @@ contains
     DIMENSIONS = 2
     BOUNDARY   = 4
 
-    XSIZE = 128
-    YSIZE = 128
+    XSIZE = 256
+    YSIZE = 256
     ZSIZE = 1
 
     XDOMN = 1.0D0

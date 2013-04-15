@@ -8,6 +8,19 @@
 !     -- Main actions: determine these input states.
 !
 ! ----------------------------------------------------------------------------------------------------------------------------------
+!
+!     Copyright 2012, 2013 Hari Sriskantha.
+!     This file is part of Magneto.
+!
+!     Magneto is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as
+!     published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!
+!     Magneto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+!     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+!   
+!     A copy of the GNU General Public License can be found in the folder 'readmes', or at <http://www.gnu.org/licenses/>.
+!
+! ----------------------------------------------------------------------------------------------------------------------------------
 ! --- This code is best viewed with a window at least 135 characters wide ----------------------------------------------------------
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
@@ -86,7 +99,7 @@ module recon
   real (PREC), dimension(:,:), allocatable :: sigma, dw
 
 
-  ! Specific for PPM(CS)
+  ! Specific for PPM
 
   real (PREC), dimension(:,:), allocatable :: wh
   
@@ -163,7 +176,7 @@ contains
     end if
 
 
-    ! Specific for PPM(CS)
+    ! Specific for PPM
 
     if ((RECONSTRUCT_TYPE == 'P') .or. (RECONSTRUCT_TYPE == 'C')) then
 
@@ -196,7 +209,7 @@ contains
 
   subroutine Determine_Riemann_input_TVD
 
-  ! This subroutine uses the algorithm of Balsara, Astrophys. J. Suppl. S., 116, 133 (1998)
+    ! This subroutine uses the algorithm of Balsara, Astrophys. J. Suppl. S., 116, 133 (1998)
 
 
   ! Declaration of local variables.
@@ -557,9 +570,9 @@ contains
 
   subroutine Determine_Riemann_input_PPM ()
 
-  ! This subroutine uses the PPM algorithm of Collela and Woodward, J. Comput. Phys., 54, 174 (1984)
-  !   --> and the montonicity adjustments of Colella and Sekora, J. Comput. Phys., 227, 7069 (2008)
-  !   --> while the characteristic tracing is based on S4.2.3 of Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
+    ! This subroutine uses the PPM algorithm of Collela and Woodward, J. Comput. Phys., 54, 174 (1984)
+    !   --> and the montonicity adjustments of Colella and Sekora, J. Comput. Phys., 227, 7069 (2008)
+    !   --> while the characteristic tracing is based on S4.2.3 of Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
 
 
   ! Declaration of local variables.
@@ -818,8 +831,6 @@ contains
     end do
 
 
-    ! Usual characteristic tracing. 
-
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do p = 1, 7
 
@@ -857,45 +868,6 @@ contains
 
        end do
     end do    
-
-
-    ! Additional characteristic tracing for approximate Riemann solvers.
-
-    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-       do p = 1, 7
-
-          if (lambda(p, m) < 0.0D0) then
-
-             C = 0.0D0
-
-             A = 0.5D0 * dtdx(m) * (lambda(p, m) - lambda(1, m))
-
-             do q = 1, 7
-                C = C + L(p, q, m) * (A * PPM_dw(q, m))
-             end do
-
-             do q = 1, 7
-                w_new_L(q, m) = w_new_L(q, m) - C * R(q, p, m)
-             end do
-
-          else if (lambda(p, m) > 0.0D0) then
-
-             C = 0.0D0
-
-             A = 0.5D0 * dtdx(m) * (lambda(p, m) - lambda(7, m))
-
-             do q = 1, 7
-                C = C + L(p, q, m) * (A * PPM_dw(q, m))
-             end do
-
-             do q = 1, 7
-                w_new_R(q, m-1) = w_new_R(q, m-1) - C * R(q, p, m)
-             end do
-
-          end if
-
-       end do
-    end do   
 
 
 
@@ -971,8 +943,8 @@ contains
 
   subroutine Determine_Riemann_input_PPMCS ()
 
-  ! This subroutine uses the PPM algorithm of Collela and Woodward, J. Comput. Phys., 54, 174 (1984)
-  !   --> ... based on the version described in Colella and Sekora, J. Comput. Phys., 227, 7069 (2008)
+    ! This subroutine uses the PPM algorithm of Collela and Woodward, J. Comput. Phys., 54, 174 (1984)
+    !   --> ... based on the version described in Colella and Sekora, J. Comput. Phys., 227, 7069 (2008)
 
 
   ! Declaration of local variables.
@@ -1184,8 +1156,6 @@ contains
     end do
 
 
-    ! Usual characteristic tracing
-
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do p = 1, 7
 
@@ -1226,45 +1196,6 @@ contains
 
        end do
     end do   
-
-
-    ! Additional characteristic tracing for approximate Riemann solvers.
-
-    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-       do p = 1, 7
-
-          if (lambda(p, m) < 0.0D0) then
-
-             C = 0.0D0
-
-             A = 0.5D0 * dtdx(m) * (lambda(p, m) - lambda(1, m))
-
-             do q = 1, 7
-                C = C + L(p, q, m) * (A * PPM_dw(q, m))
-             end do
-
-             do q = 1, 7
-                w_new_L(q, m) = w_new_L(q, m) - C * R(q, p, m)
-             end do
-
-          else if (lambda(p, m) > 0.0D0) then
-
-             C = 0.0D0
-
-             A = 0.5D0 * dtdx(m) * (lambda(p, m) - lambda(7, m))
-
-             do q = 1, 7
-                C = C + L(p, q, m) * (A * PPM_dw(q, m))
-             end do
-
-             do q = 1, 7
-                w_new_R(q, m-1) = w_new_R(q, m-1) - C * R(q, p, m)
-             end do
-
-          end if
-
-       end do
-    end do     
 
 
 
@@ -1369,7 +1300,7 @@ contains
 
   subroutine Calculate_eigensystem ()
 
-    ! See Roe and Balsara, SIAM J. Appl. Math., 56, 57 (1996)
+    ! MHD Eigensystem as given by Roe and Balsara, SIAM J. Appl. Math., 56, 57 (1996)
 
 
   ! Declaration of variables.
@@ -1439,8 +1370,8 @@ contains
 
 
 
-  ! Calculating eigens-system.
-  ! --------------------------
+  ! Determining eigenvalues.
+  ! ------------------------
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
 
@@ -1455,6 +1386,10 @@ contains
 
     end do
 
+
+
+  ! Determining eigenvectors.
+  ! -------------------------
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
 
@@ -1700,7 +1635,7 @@ contains
     end if
 
 
-    ! Specific for PPM(CS)
+    ! Specific for PPM
 
     if ((RECONSTRUCT_TYPE == 'P') .or. (RECONSTRUCT_TYPE == 'C')) then
 

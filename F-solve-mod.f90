@@ -8,6 +8,19 @@
 !     -- Main actions: determine these inter-cell fluxes.
 !
 ! ----------------------------------------------------------------------------------------------------------------------------------
+!
+!     Copyright 2012, 2013 Hari Sriskantha.
+!     This file is part of Magneto.
+!
+!     Magneto is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as
+!     published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!
+!     Magneto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+!     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+!   
+!     A copy of the GNU General Public License can be found in the folder 'readmes', or at <http://www.gnu.org/licenses/>.
+!
+! ----------------------------------------------------------------------------------------------------------------------------------
 ! --- This code is best viewed with a window at least 135 characters wide. ---------------------------------------------------------
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
@@ -134,7 +147,7 @@ contains
 
   subroutine Calculate_intercell_fluxes_HLLD ()
 
-  ! For full details of algorithm, see: Miyoshi and Kusano, J. Comput. Phys., 208, 315 (2005)
+    ! This subroutine is based on the algorithm of Miyoshi and Kusano, J. Comput. Phys., 208, 315 (2005)
 
 
   ! Declaration of local variables.
@@ -206,7 +219,7 @@ contains
 
     do m =  BOUNDARY, rowsize + BOUNDARY
 
-       ! Method of Miyoshi and Kusano, J. Comput. Phys., 208, 315 (2005) -- eq. (67)
+       ! Wavespeed estimate of Miyoshi and Kusano, J. Comput. Phys., 208, 315 (2005) -- eq. (67)
 
        if (WAVESPEED_TYPE == 'M') then
 
@@ -259,7 +272,7 @@ contains
        end if
 
 
-       ! Method of Janhunen, J. Comput. Phys., 160, 649 (2000) -- eq. (27)
+       ! Wavespeed estimate of Janhunen, J. Comput. Phys., 160, 649 (2000) -- eq. (27)
 
        if (WAVESPEED_TYPE == 'J') then
 

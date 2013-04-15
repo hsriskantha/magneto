@@ -6,6 +6,19 @@
 !     ===================
 !     -- Main variables: 1D row versions of the fluid and magnetic field variables.
 !     -- Main actions: extract 1D row from 3D grid; return 1D row to 3D grid.
+!
+! ----------------------------------------------------------------------------------------------------------------------------------
+!
+!     Copyright 2012, 2013 Hari Sriskantha.
+!     This file is part of Magneto.
+!
+!     Magneto is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as
+!     published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!
+!     Magneto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+!     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+!   
+!     A copy of the GNU General Public License can be found in the folder 'readmes', or at <http://www.gnu.org/licenses/>.
 !                                  
 ! ----------------------------------------------------------------------------------------------------------------------------------
 ! --- This code is best viewed with a window at least 135 characters wide. ---------------------------------------------------------
@@ -245,8 +258,6 @@ contains
   ! Extracting the inner row (minus boundaries).
   ! --------------------------------------------
 
-    ! See readmes/equation.pdf, S3.1
-
     rowsize = XSIZE
     rowfull = XFULL
 
@@ -347,8 +358,6 @@ contains
   ! Extracting the inner row (minus boundaries).
   ! --------------------------------------------
 
-    ! See readmes/equation.pdf, S3.1
-
     rowsize = YSIZE
     rowfull = YFULL
 
@@ -448,8 +457,6 @@ contains
 
   ! Extracting the inner row (minus boundaries).
   ! --------------------------------------------
-
-    ! See readmes/equation.pdf, S3.1
     
     rowsize = ZSIZE
     rowfull = ZFULL
@@ -614,8 +621,6 @@ contains
   ! Returning the inner row.
   ! ------------------------
 
-    ! See readmes/equation.pdf, S3.1
-
     do i = 1, rowsize
 
        iB = i + BOUNDARY
@@ -716,8 +721,6 @@ contains
 
     ! Returning the inner row.
     ! ------------------------
-    
-    ! See readmes/equation.pdf, S3.1
 
     do j = 1, rowsize
 
@@ -818,8 +821,6 @@ contains
 
   ! Returning the inner row.
   ! ------------------------
-
-    ! See readmes/equation.pdf, S3.1
 
     do k = 1, rowsize
 
