@@ -8,7 +8,7 @@
 !
 ! ----------------------------------------------------------------------------------------------------------------------------------
 !
-!     Copyright 2012, 2013 Hari Sriskantha.
+!     Copyright 2012, 2013 Hari Sriskantha (School of Mathematics, University of Edinburgh).
 !     This file is part of Magneto.
 !
 !     Magneto is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as

@@ -4,7 +4,7 @@
 ! --- Quick Start Guide ------------------------------------------------------------------------------------------------------------
 ! ----------------------------------------------------------------------------------------------------------------------------------
 !
-!     Copyright 2012, 2013 Hari Sriskantha.                                                .
+!     Copyright 2012, 2013 Hari Sriskantha (School of Mathematics, University of Edinburgh).
 !     This file is part of Magneto.
 !
 !     Magneto is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as
@@ -36,3 +36,11 @@
     4. The makefile contains two types of 'clean'. Typing 'make clean' removes the object files (stored in the folder
        'objects') and any copies of files which end with '~' (usually created after editing a file with emacs). Typing
        'make fullclean' also removes all the output files, and the compiled program file. 
+
+
+  If you want to find out more about the algorithms used in this software, please refer to the references included in the 
+  source code. Alternatively, an overview -- including a description of the contrained transport algorithm used to ensure
+  the magnetic field remains divergence-free -- can be found in the following publications: 
+
+    - On the arxiv: <http://arxiv.org/abs/1304.3609>.
+    - Soon to be published in the Monthly Notices of the Royal Astronomical Society. 
