@@ -181,6 +181,14 @@ contains
 
   subroutine Load_settings ()
 
+  ! Namelist of parameters.
+  ! -----------------------
+
+    namelist /parameters/ &
+         TEST_PROBLEM, OUTPUT_TYPE, &
+         RECONSTRUCT_TYPE, WAVESPEED_TYPE, &
+         VARIABLE_DELTAT, PRINT_DELTAT, PRESSURE_FIX, DEBUG_MODE, &
+         PRINT_FREQ         
 
   ! Declaration of local variables.
   ! -------------------------------
@@ -190,33 +198,15 @@ contains
 
 
 
-  ! Opening file and loading header.
-  ! --------------------------------
+  ! Opening file.
+  ! -------------
 
     open (100, file = "start.txt")
-
-    do n = 1, 24
-       read (100, *) heading
-    end do
-
-
 
   ! Loading settings.
   ! -----------------
 
-    read (100, *) setting, TEST_PROBLEM
-    read (100, *) setting, OUTPUT_TYPE
-
-    read (100, *) setting, RECONSTRUCT_TYPE
-    read (100, *) setting, WAVESPEED_TYPE
-
-    read (100, *) setting, VARIABLE_DELTAT
-    read (100, *) setting, PRINT_DELTAT
-    read (100, *) setting, PRESSURE_FIX
-    read (100, *) setting, DEBUG_MODE
-
-    read (100, *) setting, PRINT_FREQ
-
+    read(100, nml=parameters)
 
 
   ! Closing file.
