@@ -25,20 +25,20 @@
 ! --- This code is best viewed with a window at least 135 characters wide. ---------------------------------------------------------
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
+&parameters
+TEST_PROBLEM = "A",
+OUTPUT_TYPE  = "A",
 
-"TEST_PROBLEM -------", "B"
-"OUTPUT_TYPE --------", "C"
+RECONSTRUCT_TYPE = "P",
+WAVESPEED_TYPE   = "J",
 
-"RECONSTRUCT_TYPE ---", "P"
-"WAVESPEED_TYPE -----", "J"
+VARIABLE_DELTAT = .true.,
+PRINT_DELTAT    = .true.,
+PRESSURE_FIX    = .true.,
+DEBUG_MODE      = .true.,
 
-"VARIABLE_DELTAT ----", .true.
-"PRINT_DELTAT -------", .true.
-"PRESSURE_FIX -------", .true.
-"DEBUG_MODE ---------", .true.
-
-"PRINT_FREQ ---------", 100
-
+PRINT_FREQ      = 100
+/
 
   ! --------------------------------------------------------------------------------------------------------------------------------
   ! [STA_A] GUIDE: Settings and Initial Conditions
