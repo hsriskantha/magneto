@@ -181,6 +181,7 @@ contains
 
   subroutine Load_settings ()
 
+
   ! Namelist of parameters.
   ! -----------------------
 
@@ -190,27 +191,14 @@ contains
          VARIABLE_DELTAT, PRINT_DELTAT, PRESSURE_FIX, DEBUG_MODE, &
          PRINT_FREQ         
 
-  ! Declaration of local variables.
-  ! -------------------------------
-
-    character :: heading*130, setting*20
-    integer   :: n
 
 
-
-  ! Opening file.
+  ! Reading file.
   ! -------------
 
     open (100, file = "start.txt")
 
-  ! Loading settings.
-  ! -----------------
-
     read(100, nml=parameters)
-
-
-  ! Closing file.
-  ! -------------
 
     close (100)
 
