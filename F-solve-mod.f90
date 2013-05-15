@@ -201,6 +201,7 @@ contains
 
        velc = Create_vector (x_velocity_R(m), y_velocity_R(m), z_velocity_R(m))
        magf = Create_vector (x_magfield_R(m), y_magfield_R(m), z_magfield_R(m))
+       magf_squrd = Dotproduct (magf, magf)
 
        flux_R(m, 1) = density_R(m) * x_velocity_R(m)
        flux_R(m, 2) = flux_R(m, 1) * x_velocity_R(m) + pressure_R(m) - MHDF(2) * (x_magfield_R(m)**2.0D0)
