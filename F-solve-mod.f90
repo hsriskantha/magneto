@@ -478,7 +478,7 @@ contains
        z_velocity_S2(m) = roe_temp + (z_velocity_S2(m) / scratch)
 
 
-       scratch = MHDF(-1) * (dsqrt(density_SL1(m) + dsqrt(density_SR1(m))))
+       scratch = MHDF(-1) * (dsqrt(density_SL1(m)) + dsqrt(density_SR1(m)))
 
        roe_temp         = roeavg(MHDF(-2) * density_SL1(m), MHDF(-2) * density_SR1(m), y_magfield_SR1(m), y_magfield_SL1(m))
        y_magfield_S2(m) = MHDF(-2) * dsqrt(density_SL1(m) * density_SR1(m)) * (y_velocity_SR1(m) - y_velocity_SL1(m))
