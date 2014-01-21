@@ -68,7 +68,7 @@ contains
 ! ----------------------------------------------------------------------------------------------------------------------------------
 ! --- SUBROUTINE: Set Initial Conditions of Fluid ---------------------------------------------------------------------- [TES01] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- Version A: Sod's 1D Shock Tube Test (magnetic) -------------------------------------------------------------------------------
+! --- Version A: Brio and Wu's 1D Shock Tube Test ----------------------------------------------------------------------------------
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
   subroutine Set_initial_conditions_A ()
@@ -89,7 +89,7 @@ contains
   ! ---------------
 
     DELTAT   = 0.0001D0
-    FULLTIME = 0.1D0
+    FULLTIME = 0.16D0
 
     COURANT    = 0.25D0
     MAX_DELTAT = 0.01D0
@@ -97,7 +97,7 @@ contains
     DIMENSIONS = 1
     BOUNDARY   = 4
 
-    XSIZE = 400
+    XSIZE = 512
     YSIZE = 1
     ZSIZE = 1
 
@@ -107,7 +107,7 @@ contains
 
     MHDUNITS = 2     ! see <TES_B>
 
-    XZERO = 0.4D0
+    XZERO = 0.5D0
 
 
 
@@ -137,7 +137,7 @@ contains
        y_velocity(i, 1, 1) = 0.0D0
        z_velocity(i, 1, 1) = 0.0D0
 
-       gamma(i, 1, 1) = 5.0D0 / 3.0D0
+       gamma(i, 1, 1) = 2.0D0
 
        x_magfield(i, 1, 1) = 0.75D0 
        y_magfield(i, 1, 1) = 1.00D0 
@@ -173,7 +173,7 @@ contains
        y_velocity(i, 1, 1) = 0.0D0
        z_velocity(i, 1, 1) = 0.0D0
 
-       gamma(i, 1, 1) = 5.0D0 / 3.0D0
+       gamma(i, 1, 1) = 2.0D0
 
        x_magfield(i, 1, 1) = 0.75D0 
        y_magfield(i, 1, 1) = -1.0D0 
@@ -219,10 +219,312 @@ contains
 ! ----------------------------------------------------------------------------------------------------------------------------------
 ! --- SUBROUTINE: Set Initial Conditions of Fluid ---------------------------------------------------------------------- [TES02] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- Version B: Circularly Polarised Alfven Waves ---------------------------------------------------------------------------------
+! --- Version B: Ryu and Jones' Shock Tube Test (2A) -------------------------------------------------------------------------------
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
   subroutine Set_initial_conditions_B ()
+
+
+  ! Declaration of local variables.
+  ! -------------------------------
+
+    integer :: i, x_zero
+    real (PREC) :: XZERO
+    
+    real (PREC), dimension(3) :: magf, velc
+    real (PREC) :: magf_squrd, velc_squrd
+
+
+
+  ! Time and space.
+  ! ---------------
+
+    DELTAT   = 0.0001D0
+    FULLTIME = 0.16D0
+
+    COURANT    = 0.25D0
+    MAX_DELTAT = 0.01D0
+
+    DIMENSIONS = 1
+    BOUNDARY   = 4
+
+    XSIZE = 512
+    YSIZE = 1
+    ZSIZE = 1
+
+    XDOMN = 1.0D0
+    YDOMN = 1.0D0 * (real(YSIZE) / real(XSIZE))
+    ZDOMN = 1.0D0 * (real(ZSIZE) / real(XSIZE))
+
+    MHDUNITS = 2     ! see <TES_B>
+
+    XZERO = 0.5D0
+
+
+
+  ! Initialising fluid.
+  ! -------------------
+
+    BASE_FILE_NO = 0
+    BASE_NTIME   = 0.00D0
+
+    call Initialise_fluid ()     ! --> <FLU01> 
+
+
+
+  ! Setting initial conditions.
+  ! ---------------------------
+
+    x_zero = ceiling(XZERO * real(XSIZE))
+
+    do i = 1, x_zero
+
+       ! Note: these values need setting. 
+
+       density(i, 1, 1)  = 1.08D0
+       pressure(i, 1, 1) = 0.95D0
+
+       x_velocity(i, 1, 1) = 1.2D0
+       y_velocity(i, 1, 1) = 0.01D0
+       z_velocity(i, 1, 1) = 0.5D0
+
+       gamma(i, 1, 1) = 5.0D0 / 3.0D0
+
+       x_magfield(i, 1, 1) = 0.5641895835477562D0 
+       y_magfield(i, 1, 1) = 1.0155412503859613D0 
+       z_magfield(i, 1, 1) = 0.5641895835477562D0 
+
+
+       ! Note: these values are set automatically.
+
+       x_momentum(i, 1, 1) = density(i, 1, 1) * x_velocity(i, 1, 1)
+       y_momentum(i, 1, 1) = density(i, 1, 1) * y_velocity(i, 1, 1)
+       z_momentum(i, 1, 1) = density(i, 1, 1) * z_velocity(i, 1, 1)
+
+       magf = Create_vector(x_magfield(i, 1, 1), y_magfield(i, 1, 1), z_magfield(i, 1, 1))
+       velc = Create_vector(x_velocity(i, 1, 1), y_velocity(i, 1, 1), z_velocity(i, 1, 1))
+
+       magf_squrd = Dotproduct (magf, magf)
+       velc_squrd = Dotproduct (velc, velc)
+
+       pressure(i, 1, 1) = Calculate_total_pressure (pressure(i, 1, 1), magf_squrd)
+       energy(i, 1, 1) = Calculate_energy_EOS (density(i, 1, 1), pressure(i, 1, 1), gamma(i, 1, 1), velc_squrd, magf_squrd)
+
+    end do
+
+
+    do i = x_zero + 1, XSIZE
+
+       ! Note: these values need setting. 
+
+       density(i, 1, 1)  = 1.0D0
+       pressure(i, 1, 1) = 1.0D0
+
+       x_velocity(i, 1, 1) = 0.0D0
+       y_velocity(i, 1, 1) = 0.0D0
+       z_velocity(i, 1, 1) = 0.0D0
+
+       gamma(i, 1, 1) = 5.0D0 / 3.0D0
+
+       x_magfield(i, 1, 1) = 0.5641895835477562D0
+       y_magfield(i, 1, 1) = 1.1283791670955125D0
+       z_magfield(i, 1, 1) = 0.5641895835477562D0 
+
+
+       ! Note: these values are set automatically.
+
+       x_momentum(i, 1, 1) = density(i, 1, 1) * x_velocity(i, 1, 1)
+       y_momentum(i, 1, 1) = density(i, 1, 1) * y_velocity(i, 1, 1)
+       z_momentum(i, 1, 1) = density(i, 1, 1) * z_velocity(i, 1, 1)
+
+       magf = Create_vector(x_magfield(i, 1, 1), y_magfield(i, 1, 1), z_magfield(i, 1, 1))
+       velc = Create_vector(x_velocity(i, 1, 1), y_velocity(i, 1, 1), z_velocity(i, 1, 1))
+
+       magf_squrd = Dotproduct (magf, magf)
+       velc_squrd = Dotproduct (velc, velc)
+
+       pressure(i, 1, 1) = Calculate_total_pressure (pressure(i, 1, 1), magf_squrd)
+       energy(i, 1, 1) = Calculate_energy_EOS (density(i, 1, 1), pressure(i, 1, 1), gamma(i, 1, 1), velc_squrd, magf_squrd)
+
+    end do
+
+
+
+  ! Set the boundary conditions.
+  ! ----------------------------
+
+    BOUNDTYPE = 1     ! see <TES_A>
+
+    return
+    
+    
+
+! ----------------------------------------------------------------------------------------------------------------------------------
+  end subroutine Set_initial_conditions_B
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
+! --- SUBROUTINE: Set Initial Conditions of Fluid ---------------------------------------------------------------------- [TES03] ---
+! ----------------------------------------------------------------------------------------------------------------------------------
+! --- Version A: Ryu and Jones' Shock Tube Test (4D) -------------------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+  subroutine Set_initial_conditions_C ()
+
+
+  ! Declaration of local variables.
+  ! -------------------------------
+
+    integer :: i, x_zero
+    real (PREC) :: XZERO
+    
+    real (PREC), dimension(3) :: magf, velc
+    real (PREC) :: magf_squrd, velc_squrd
+
+
+
+  ! Time and space.
+  ! ---------------
+
+    DELTAT   = 0.0001D0
+    FULLTIME = 0.16D0
+
+    COURANT    = 0.25D0
+    MAX_DELTAT = 0.01D0
+
+    DIMENSIONS = 1
+    BOUNDARY   = 4
+
+    XSIZE = 512
+    YSIZE = 1
+    ZSIZE = 1
+
+    XDOMN = 1.0D0
+    YDOMN = 1.0D0 * (real(YSIZE) / real(XSIZE))
+    ZDOMN = 1.0D0 * (real(ZSIZE) / real(XSIZE))
+
+    MHDUNITS = 2     ! see <TES_B>
+
+    XZERO = 0.5D0
+
+
+
+  ! Initialising fluid.
+  ! -------------------
+
+    BASE_FILE_NO = 0
+    BASE_NTIME   = 0.00D0
+
+    call Initialise_fluid ()     ! --> <FLU01> 
+
+
+
+  ! Setting initial conditions.
+  ! ---------------------------
+
+    x_zero = ceiling(XZERO * real(XSIZE))
+
+    do i = 1, x_zero
+
+       ! Note: these values need setting. 
+
+       density(i, 1, 1)  = 1.00D0
+       pressure(i, 1, 1) = 1.00D0
+
+       x_velocity(i, 1, 1) = 0.0D0
+       y_velocity(i, 1, 1) = 0.0D0
+       z_velocity(i, 1, 1) = 0.0D0
+
+       gamma(i, 1, 1) = 5.0D0 / 3.0D0
+
+       x_magfield(i, 1, 1) = 0.7D0
+       y_magfield(i, 1, 1) = 0.0D0
+       z_magfield(i, 1, 1) = 0.0D0
+
+
+       ! Note: these values are set automatically.
+
+       x_momentum(i, 1, 1) = density(i, 1, 1) * x_velocity(i, 1, 1)
+       y_momentum(i, 1, 1) = density(i, 1, 1) * y_velocity(i, 1, 1)
+       z_momentum(i, 1, 1) = density(i, 1, 1) * z_velocity(i, 1, 1)
+
+       magf = Create_vector(x_magfield(i, 1, 1), y_magfield(i, 1, 1), z_magfield(i, 1, 1))
+       velc = Create_vector(x_velocity(i, 1, 1), y_velocity(i, 1, 1), z_velocity(i, 1, 1))
+
+       magf_squrd = Dotproduct (magf, magf)
+       velc_squrd = Dotproduct (velc, velc)
+
+       pressure(i, 1, 1) = Calculate_total_pressure (pressure(i, 1, 1), magf_squrd)
+       energy(i, 1, 1) = Calculate_energy_EOS (density(i, 1, 1), pressure(i, 1, 1), gamma(i, 1, 1), velc_squrd, magf_squrd)
+
+    end do
+
+
+    do i = x_zero + 1, XSIZE
+
+       ! Note: these values need setting. 
+
+       density(i, 1, 1)  = 0.3D0
+       pressure(i, 1, 1) = 0.2D0
+
+       x_velocity(i, 1, 1) = 0.0D0
+       y_velocity(i, 1, 1) = 0.0D0
+       z_velocity(i, 1, 1) = 1.0D0
+
+       gamma(i, 1, 1) = 5.0D0 / 3.0D0
+
+       x_magfield(i, 1, 1) = 0.7D0
+       y_magfield(i, 1, 1) = 1.0D0
+       z_magfield(i, 1, 1) = 0.0D0
+
+
+       ! Note: these values are set automatically.
+
+       x_momentum(i, 1, 1) = density(i, 1, 1) * x_velocity(i, 1, 1)
+       y_momentum(i, 1, 1) = density(i, 1, 1) * y_velocity(i, 1, 1)
+       z_momentum(i, 1, 1) = density(i, 1, 1) * z_velocity(i, 1, 1)
+
+       magf = Create_vector(x_magfield(i, 1, 1), y_magfield(i, 1, 1), z_magfield(i, 1, 1))
+       velc = Create_vector(x_velocity(i, 1, 1), y_velocity(i, 1, 1), z_velocity(i, 1, 1))
+
+       magf_squrd = Dotproduct (magf, magf)
+       velc_squrd = Dotproduct (velc, velc)
+
+       pressure(i, 1, 1) = Calculate_total_pressure (pressure(i, 1, 1), magf_squrd)
+       energy(i, 1, 1) = Calculate_energy_EOS (density(i, 1, 1), pressure(i, 1, 1), gamma(i, 1, 1), velc_squrd, magf_squrd)
+
+    end do
+
+
+
+  ! Set the boundary conditions.
+  ! ----------------------------
+
+    BOUNDTYPE = 1     ! see <TES_A>
+
+    return
+    
+    
+
+! ----------------------------------------------------------------------------------------------------------------------------------
+  end subroutine Set_initial_conditions_C
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
+! --- SUBROUTINE: Set Initial Conditions of Fluid ---------------------------------------------------------------------- [TES05] ---
+! ----------------------------------------------------------------------------------------------------------------------------------
+! --- Version E: Circularly Polarised Alfven Waves ---------------------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+  subroutine Set_initial_conditions_E ()
 
 
   ! Declaration of local variables.
@@ -368,7 +670,7 @@ contains
     
     
 ! ----------------------------------------------------------------------------------------------------------------------------------
-  end subroutine Set_initial_conditions_B
+  end subroutine Set_initial_conditions_E
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -376,12 +678,12 @@ contains
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- SUBROUTINE: Set Initial Conditions of Fluid ---------------------------------------------------------------------- [TES03] ---
+! --- SUBROUTINE: Set Initial Conditions of Fluid ---------------------------------------------------------------------- [TES06] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- Version C: The Blast Problem -------------------------------------------------------------------------------------------------
+! --- Version F: The Blast Problem -------------------------------------------------------------------------------------------------
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
-  subroutine Set_initial_conditions_C ()
+  subroutine Set_initial_conditions_F ()
 
 
   ! Declaration of local variables.
@@ -492,7 +794,7 @@ contains
     
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-  end subroutine Set_initial_conditions_C
+  end subroutine Set_initial_conditions_F
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -500,12 +802,12 @@ contains
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- SUBROUTINE: Set Initial Conditions of Fluid ---------------------------------------------------------------------- [TES04] ---
+! --- SUBROUTINE: Set Initial Conditions of Fluid ---------------------------------------------------------------------- [TES07] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- Version D: The Orszag-Tang Vortex --------------------------------------------------------------------------------------------
+! --- Version G: The Orszag-Tang Vortex --------------------------------------------------------------------------------------------
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
-  subroutine Set_initial_conditions_D ()
+  subroutine Set_initial_conditions_G ()
 
 
   ! Declaration of local variables.
@@ -611,7 +913,7 @@ contains
     
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-  end subroutine Set_initial_conditions_D
+  end subroutine Set_initial_conditions_G
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -619,12 +921,12 @@ contains
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- SUBROUTINE: Set Initial Conditions of Fluid ---------------------------------------------------------------------- [TES05] ---
+! --- SUBROUTINE: Set Initial Conditions of Fluid ---------------------------------------------------------------------- [TES08] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- Version E: The MHD Rotor Problem ---------------------------------------------------------------------------------------------
+! --- Version H: The MHD Rotor Problem ---------------------------------------------------------------------------------------------
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
-  subroutine Set_initial_conditions_E ()
+  subroutine Set_initial_conditions_H ()
 
 
   ! Declaration of local variables.
@@ -762,7 +1064,7 @@ contains
     
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-  end subroutine Set_initial_conditions_E
+  end subroutine Set_initial_conditions_H
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -770,12 +1072,12 @@ contains
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- SUBROUTINE: Set Initial Conditions of Fluid ---------------------------------------------------------------------- [TES06] ---
+! --- SUBROUTINE: Set Initial Conditions of Fluid ---------------------------------------------------------------------- [TES09] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- Version F: The Kelvin-Helmholtz Instability ----------------------------------------------------------------------------------
+! --- Version I: The Kelvin-Helmholtz Instability ----------------------------------------------------------------------------------
 ! ----------------------------------------------------------------------------------------------------------------------------------
  
-  subroutine Set_initial_conditions_F
+  subroutine Set_initial_conditions_I
 
 
   ! Declaration of local variables.
@@ -885,7 +1187,7 @@ contains
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-  end subroutine Set_initial_conditions_F
+  end subroutine Set_initial_conditions_I
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -893,7 +1195,7 @@ contains
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- SUBROUTINE: Load a Restart File  --------------------------------------------------------------------------------- [TES07] ---
+! --- SUBROUTINE: Load a Restart File  --------------------------------------------------------------------------------- [TES10] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
   subroutine Load_restart_files()

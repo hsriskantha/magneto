@@ -31,8 +31,8 @@
 TEST_PROBLEM = "A",
 OUTPUT_TYPE  = "A",
 
-RECONSTRUCT_TYPE = "P",
-WAVESPEED_TYPE   = "J",
+RECONSTRUCT_TYPE = "T",
+WAVESPEED_TYPE   = "M",
 
 VARIABLE_DELTAT = .true.,
 PRINT_DELTAT    = .true.,
@@ -53,12 +53,14 @@ PRINT_FREQ      = 100
   !
   !     TEST_PROBLEM :: This setting determines the initial conditions. The options are:
   !     ------------
-  !       = 'A' - Sod's 1D Shock Tube Test (magnetic)
-  !       = 'B' - Circularly Polarised Alfven Waves
-  !       = 'C' - The Blast Problem
-  !       = 'D' - The Orszag-Tang Vortex
-  !       = 'E' - The MHD Rotor Problem
-  !       = 'F' - The Kelvin-Helmholtz Instability
+  !       = 'A' - Brio and Wu's Shock Tube Test
+  !       = 'B' - Ryu and Jones' Shock Tube Test (2A)
+  !       = 'C' - Ryu and Jones' Shock Tube Test (4D)
+  !       = 'E' - Circularly Polarised Alfven Waves
+  !       = 'F' - The Blast Problem
+  !       = 'G' - The Orszag-Tang Vortex
+  !       = 'H' - The MHD Rotor Problem
+  !       = 'I' - The Kelvin-Helmholtz Instability
   !       = 'X' - Load data from restart file
   !     Alternatively, you can create your own subroutine in C-tests-mod.f90, using the existing ones as templates
   !     (and make sure to update the code in G-evolve-mod and H-error-mod so the program recognises any new options...)

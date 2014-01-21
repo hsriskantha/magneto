@@ -149,29 +149,37 @@ FUNCTIONS AND SUBROUTINES
 
 - [TES01]: subroutine Set_initial_conditions_A ()
            Set Initial Conditions of Fluid
-             >> Version A: Sod's 1D Shock Tube Test (magnetic)
+             >> Version A: Brio and Wu's Shock Tube Test
 
 - [TES02]: subroutine Set_initial_conditions_B ()
            Set Initial Conditions of Fluid
-             >> Version B: Circularly Polarised Alfven Waves
+             >> Version B: Ryu and Jones' Shock Tube Test (2A)
 
 - [TES03]: subroutine Set_initial_conditions_C ()
            Set Initial Conditions of Fluid
-             >> Version C: The Blast Problem 
-
-- [TES04]: subroutine Set_initial_conditions_D ()
-           Set Initial Conditions of Fluid
-             >> Version D: The Orszag-Tang Vortex
+             >> Version C: Ryu and Jones' Shock Tube Test (4D)
 
 - [TES05]: subroutine Set_initial_conditions_E ()
            Set Initial Conditions of Fluid
-             >> Version E: The MHD Rotor Problem
+             >> Version E: Circularly Polarised Alfven Waves
 
 - [TES06]: subroutine Set_initial_conditions_F ()
            Set Initial Conditions of Fluid
-             >> Version F: The Kelvin-Helmholtz Instability
+             >> Version F: The Blast Problem 
 
-- [TES07]: subroutine Load_restart_file ()
+- [TES07]: subroutine Set_initial_conditions_G ()
+           Set Initial Conditions of Fluid
+             >> Version G: The Orszag-Tang Vortex
+
+- [TES08]: subroutine Set_initial_conditions_H ()
+           Set Initial Conditions of Fluid
+             >> Version H: The MHD Rotor Problem
+
+- [TES09]: subroutine Set_initial_conditions_I ()
+           Set Initial Conditions of Fluid
+             >> Version I: The Kelvin-Helmholtz Instability
+
+- [TES10]: subroutine Load_restart_file ()
            Load a Restart File
 
 
