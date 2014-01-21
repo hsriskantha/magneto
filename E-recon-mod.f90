@@ -92,7 +92,7 @@ module recon
   real (PREC), dimension(:,:), allocatable :: w_L, w_R
 
 
-  ! Specific for TVD
+  ! Specific for TVD/PLM
 
   real (PREC), dimension(:,:), allocatable :: wp, w0, wm
   real (PREC), dimension(:,:), allocatable :: rp_p, rm_p, rd_p
@@ -101,7 +101,7 @@ module recon
   real (PREC), dimension(:,:), allocatable :: sigma, dw
 
 
-  ! Specific for PPM
+  ! Specific for PLM/PPM
 
   real (PREC), dimension(:,:), allocatable :: wh
   
@@ -186,10 +186,26 @@ contains
 
        allocate (dwL(7, MFULL));   allocate (dwR(7, MFULL));   allocate (dwC(7, MFULL));   allocate (dwG(7, MFULL))
        allocate (daL(7, MFULL));   allocate (daR(7, MFULL));   allocate (daC(7, MFULL));   allocate (daG(7, MFULL))
+
+       allocate (delta_a(7, MFULL))
        
-       allocate (PPM_dw(7, MFULL))   
-       allocate (PPM_w6(7, MFULL))
-       allocate (delta_a(7, MFULL))  
+       if (RECONSTRUCT_TYPE == 'L') then
+
+          allocate (wp(7, MFULL));   allocate (wm(7, MFULL))
+
+          allocate (sigma (7, MFULL))
+
+          allocate (rp_p(7, MFULL));   allocate (rm_p(7, MFULL));   allocate (rd_p(7, MFULL))
+          allocate (rp_m(7, MFULL));   allocate (rm_m(7, MFULL));   allocate (rd_m(7, MFULL))
+
+          allocate (dw(7, MFULL))
+
+       else
+
+          allocate (PPM_dw(7, MFULL))   
+          allocate (PPM_w6(7, MFULL))  
+
+       end if
 
     end if
 
@@ -586,6 +602,11 @@ contains
     real (PREC) :: A, B, C
     real (PREC) :: scratch1, scratch2, wlim
 
+    real (PREC) :: beta, mu, qa
+
+    real (PREC), dimension(7) ::  rpl_p, rmi_p, del_p
+    real (PREC), dimension(7) ::  rpl_m, rmi_m, del_m
+
     integer :: m     ! m is used to label spatial position (i.e. m in [1, MFULL])
     integer :: p     ! p and q are used to label elements of state-based vectors (i.e. with 7 elements).  
     integer :: q     !   Usually, p labels eigenvalues (e.g. p = 1 corresponds to v_x - c_f).
@@ -645,6 +666,11 @@ contains
              daC(p, m) = daC(p, m) + (L(p, q, m) * dwC(q, m))
              daG(p, m) = daG(p, m) + (L(p, q, m) * dwG(q, m))
 
+             ! For steepening algorithm
+
+             wp(p, m) = wp(p, m) + (L(p, q, m) * w(q, m+1))
+             wm(p, m) = wm(p, m) + (L(p, q, m) * w(q, m-1))
+
           end do
        end do
 
@@ -696,6 +722,133 @@ contains
        end do
 
     end do
+
+
+
+  ! Step five-and-a-half: steepening algorithm.
+  ! -------------------------------------------
+
+!!$    ! Calculating sigma
+!!$
+!!$    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+!!$
+!!$       do q = 1, 7
+!!$
+!!$          beta = 0.0D0
+!!$          mu   = 0.0D0
+!!$
+!!$          sigma(q, m) = 0.0D0
+!!$
+!!$       end do
+!!$
+!!$       do q = 1, 7 !2, 2, 6
+!!$
+!!$          if ((daL(q, m) * daR(q, m)) > 0.0D0) then
+!!$
+!!$             scratch1 = abs(daL(q, m) / daR(q, m))
+!!$             scratch2 = 4.3D0 * (lambda(q, m) * dtdx(m)) &
+!!$                      - 0.5D0 * sign(1.0D0, lambda(q, m))
+!!$
+!!$             beta = scratch1**scratch2
+!!$
+!!$          end if
+!!$
+!!$          scratch1 = daR(q, m) - daL(q, m)
+!!$          scratch2 = abs(daL(q, m)) + abs(daR(q, m))
+!!$
+!!$          if (abs(scratch2) .gt. 0.0D0) then
+!!$             mu = (scratch1/scratch2)**2.0D0
+!!$          end if
+!!$
+!!$          sigma(q, m) = 33.0D0 * mu * beta
+!!$
+!!$       end do
+!!$
+!!$    end do
+!!$
+!!$
+!!$    ! Projections
+!!$
+!!$    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+!!$
+!!$       do q = 1, 7
+!!$
+!!$          rp_p(q, m) = 0.0D0
+!!$          rm_p(q, m) = 0.0D0
+!!$          rd_p(q, m) = 0.0D0
+!!$          
+!!$          rp_m(q, m) = 0.0D0
+!!$          rm_m(q, m) = 0.0D0
+!!$          rd_m(q, m) = 0.0D0
+!!$
+!!$          
+!!$          rpl_p(q) = w(q, m+1) - 0.5D0 * delta_w(q, m+1)
+!!$          rpl_m(q) = w(q, m  ) - 0.5D0 * delta_w(q, m  )
+!!$
+!!$          rmi_p(q) = w(q, m  ) + 0.5D0 * delta_w(q, m  )
+!!$          rmi_m(q) = w(q, m-1) + 0.5D0 * delta_w(q, m-1)
+!!$
+!!$          del_p(q) = rpl_p(q) - rmi_p(q)
+!!$          del_m(q) = rpl_m(q) - rpl_m(q)
+!!$
+!!$       end do
+!!$
+!!$       
+!!$       do q = 1, 7
+!!$          do p = 1, 7
+!!$
+!!$             rp_p(p, m) = rp_p(p, m) + (L(p, q, m) * rpl_p(q))
+!!$             rm_p(p, m) = rm_p(p, m) + (L(p, q, m) * rmi_p(q))
+!!$             rd_p(p, m) = rd_p(p, m) + (L(p, q, m) * del_p(q))
+!!$
+!!$             rp_m(p, m) = rp_m(p, m) + (L(p, q, m) * rpl_m(q))
+!!$             rm_m(p, m) = rm_m(p, m) + (L(p, q, m) * rmi_m(q))
+!!$             rd_m(p, m) = rd_m(p, m) + (L(p, q, m) * del_m(q))
+!!$
+!!$          end do
+!!$       end do
+!!$
+!!$    end do
+!!$
+!!$
+!!$    ! Slope modifier
+!!$
+!!$    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+!!$       do q = 1, 7
+!!$
+!!$          dw(q, m) = 0.0D0
+!!$
+!!$       end do
+!!$
+!!$       do q = 1, 7 !2, 2, 6
+!!$
+!!$          scratch1 = minmod(rd_m(q, m), rd_p(q, m))
+!!$
+!!$          scratch2 = minmod( (wp(q, m) - rm_p(q, m)),  &
+!!$                           (rp_m(q, m-1) - wm(q, m)) )
+!!$
+!!$          dw(q, m) = 2.0D0 * minmod(sigma(q, m) * scratch1, scratch2)
+!!$
+!!$       end do
+!!$
+!!$       delta_a(q, m) = delta_a(q, m) + dw(q, m)
+!!$
+!!$    end do
+!!$
+!!$       
+!!$  ! Applying steepening
+!!$
+!!$    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+!!$
+!!$       do q = 1, 7
+!!$          do p = 1, 7
+!!$
+!!$             delta_w(p, m) = delta_w(p, m) + (dw(q, m) * R(p, q, m))
+!!$
+!!$          end do
+!!$       end do
+!!$
+!!$    end do
 
 
 
@@ -1888,7 +2041,7 @@ contains
     deallocate (w_L);       deallocate (w_R)
 
 
-    ! Specific for TVD
+    ! Specific for TVD/PLM
 
     if (RECONSTRUCT_TYPE == 'T') then
 
@@ -1904,7 +2057,7 @@ contains
     end if
 
 
-    ! Specific for PPM
+    ! Specific for PLM/PPM
 
     if ((RECONSTRUCT_TYPE == 'L') .or. (RECONSTRUCT_TYPE == 'P') .or. (RECONSTRUCT_TYPE == 'C')) then
 
@@ -1912,10 +2065,27 @@ contains
 
        deallocate (dwL);   deallocate (dwR);   deallocate (dwC);   deallocate (dwG)
        deallocate (daL);   deallocate (daR);   deallocate (daC);   deallocate (daG)
-       
-       deallocate (PPM_dw)   
-       deallocate (PPM_w6)
+
        deallocate (delta_a)  
+
+       if (RECONSTRUCT_TYPE == 'L') then
+
+          deallocate (wp);   deallocate (wm)
+
+          deallocate (sigma)
+
+          deallocate (rp_p);   deallocate (rm_p);   deallocate (rd_p);
+          deallocate (rp_m);   deallocate (rm_m);   deallocate (rd_m);
+
+          deallocate (dw)
+          
+       else
+       
+          deallocate (PPM_dw)   
+          deallocate (PPM_w6)
+          deallocate (sigma)
+
+       end if
 
     end if
 
