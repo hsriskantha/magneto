@@ -31,7 +31,7 @@
 TEST_PROBLEM = "A",
 OUTPUT_TYPE  = "A",
 
-RECONSTRUCT_TYPE = "T",
+RECONSTRUCT_TYPE = "L",
 WAVESPEED_TYPE   = "M",
 
 VARIABLE_DELTAT = .true.,
@@ -76,6 +76,7 @@ PRINT_FREQ      = 100
   !     RECONSTRUCT_TYPE :: This setting determines the method used to calculate the input states for the Riemann problem.
   !     ----------------
   !       = 'T' - Balsara's TVD Scheme with steepening (second-order)
+  !       = 'L' - Piecewise Linear Method (second-order) - based on Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
   !       = 'P' - Piecewise Parabolic Method (third-order) - based on Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
   !       = 'C' - Piecewise Parabolic Method (third-order) - based on Colella and Sekora, J. Comput. Phys., 227, 7069 (2008)
   !

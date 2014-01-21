@@ -68,7 +68,7 @@ contains
     ! TEST_PROBLEM
 
     string_test = 0
-    string_test = verify(TEST_PROBLEM, 'ABCDEFX')
+    string_test = verify(TEST_PROBLEM, 'ABCDEFGHIX')
 
     if (string_test > 0) then
        write (*, *) 'ERROR: Invalid value of TEST_PROBLEM in start.txt'
@@ -94,7 +94,7 @@ contains
     ! RECONSTRUCT_TYPE
 
     string_test = 0
-    string_test = verify(RECONSTRUCT_TYPE, 'TPC')
+    string_test = verify(RECONSTRUCT_TYPE, 'TLPC')
 
     if (string_test > 0) then
        write (*, *) 'ERROR: Invalid value of RECONSTRUCT_TYPE in start.txt'

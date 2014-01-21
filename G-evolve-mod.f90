@@ -314,8 +314,9 @@ contains
   ! ----------------------------------
 
     if (RECONSTRUCT_TYPE == 'T') call Determine_Riemann_input_TVD       ! --> <REC02>
-    if (RECONSTRUCT_TYPE == 'P') call Determine_Riemann_input_PPM       ! --> <REC03>
-    if (RECONSTRUCT_TYPE == 'C') call Determine_Riemann_input_PPMCS     ! --> <REC04>
+    if (RECONSTRUCT_TYPE == 'L') call Determine_Riemann_input_PLM       ! --> <REC03>
+    if (RECONSTRUCT_TYPE == 'P') call Determine_Riemann_input_PPM       ! --> <REC04>
+    if (RECONSTRUCT_TYPE == 'C') call Determine_Riemann_input_PPMCS     ! --> <REC05>
 
     call Calculate_intercell_fluxes_HLLD ()     ! --> <SOL02>
 

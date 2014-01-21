@@ -180,7 +180,7 @@ contains
 
     ! Specific for PPM
 
-    if ((RECONSTRUCT_TYPE == 'P') .or. (RECONSTRUCT_TYPE == 'C')) then
+    if ((RECONSTRUCT_TYPE == 'L') .or. (RECONSTRUCT_TYPE == 'P') .or. (RECONSTRUCT_TYPE == 'C')) then
 
        allocate (wh(7, MFULL))
 
@@ -567,7 +567,274 @@ contains
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- FUNCTION: Determine the Input States for the Riemann Problem (using Piecewise Parabolic Method) ------------------ [REC03] ---
+! --- FUNCTION: Determine the Input States for the Riemann Problem (using Piecewise Linear Method) --------------------- [REC03] ---
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+  subroutine Determine_Riemann_input_PLM ()
+
+    ! This subroutine uses the PLM algorithm of Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
+
+
+  ! Declaration of local variables.
+  ! -------------------------------
+
+    real (PREC), dimension(3) :: magf, velc
+    real (PREC) :: magf_squrd, velc_squrd
+
+    logical :: cond1, cond2, cond3, cond4
+
+    real (PREC) :: A, B, C
+    real (PREC) :: scratch1, scratch2, wlim
+
+    integer :: m     ! m is used to label spatial position (i.e. m in [1, MFULL])
+    integer :: p     ! p and q are used to label elements of state-based vectors (i.e. with 7 elements).  
+    integer :: q     !   Usually, p labels eigenvalues (e.g. p = 1 corresponds to v_x - c_f).
+
+    real (PREC), parameter :: epsilon = 1D-10
+    real (PREC), parameter :: Clim = 1.25D0
+
+
+
+  ! Step one: calculating eigen-system.
+  ! -----------------------------------
+
+    call Calculate_eigensystem ()
+
+
+
+  ! Step two: compute left, right and centred differences.
+  ! ------------------------------------------------------
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+       do q = 1, 7
+
+          dwG(q, m) = 0.0D0
+
+          dwL(q, m) =  w(q, m  ) - w(q, m-1)
+          dwR(q, m) =  w(q, m+1) - w(q, m  )
+          dwC(q, m) = (w(q, m+1) - w(q, m-1))/2.0D0
+
+          if ((dwL(q, m) * dwR(q, m)) > 0.0D0) then 
+             dwG(q, m) = 2.0D0 * dwL(q, m) * dwR(q, m) / (dwL(q, m) + dwR(q, m))
+          end if
+
+       end do
+    end do
+
+
+
+  ! Step three: project differences onto characteristic variables.
+  ! --------------------------------------------------------------
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+    
+       do q = 1, 7
+
+          daL(q, m) = 0.0D0
+          daR(q, m) = 0.0D0
+          daC(q, m) = 0.0D0
+          daG(q, m) = 0.0D0
+
+       end do
+
+       do q = 1, 7
+          do p = 1, 7
+
+             daL(p, m) = daL(p, m) + (L(p, q, m) * dwL(q, m))
+             daR(p, m) = daR(p, m) + (L(p, q, m) * dwR(q, m))
+             daC(p, m) = daC(p, m) + (L(p, q, m) * dwC(q, m))
+             daG(p, m) = daG(p, m) + (L(p, q, m) * dwG(q, m))
+
+          end do
+       end do
+
+    end do
+
+
+
+  ! Step four: apply monotonicity constraints.
+  ! ------------------------------------------
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+       do q = 1, 7
+
+          delta_a(q, m) = 0.0D0
+
+          if ((daL(q, m) * daR(q, m)) >= 0.0D0) then
+
+             scratch1 = min(abs(daL(q, m)), abs(daR(q, m)))
+             scratch2 = min(abs(daC(q, m)), abs(daG(q, m)))
+
+             scratch2 = abs(daC(q, m))
+             
+             delta_a(q, m) = sign(1.0D0, daC(q, m)) * min(2.0D0 * scratch1, scratch2)
+
+          end if
+
+       end do
+    end do
+
+
+
+  ! Step five: project back onto the primitive variables.
+  ! -----------------------------------------------------
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+
+       do q = 1, 7
+
+          delta_w(q, m) = 0.0D0
+
+       end do
+
+       do q = 1, 7
+          do p = 1, 7
+
+             delta_w(p, m) = delta_w(p, m) + (delta_a(q, m) * R(p, q, m))
+
+          end do
+       end do
+
+    end do
+
+
+
+  ! Step six: compute left and right interface values.
+  ! --------------------------------------------------
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+
+       scratch1 = max(lambda(7, m), 0.0D0) * 0.5D0 * dtdx(m)
+       scratch2 = min(lambda(1, m), 0.0D0) * 0.5D0 * dtdx(m)
+
+       do q = 1, 7
+
+          w_hat_L(q, m) = w(q, m) + (0.5D0 - scratch1) * delta_w(q, m)
+          w_hat_R(q, m) = w(q, m) - (0.5D0 - scratch2) * delta_w(q, m)
+
+       end do
+
+    end do
+
+
+
+  ! Step seven: the characteristic tracing.
+  ! ---------------------------------------
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+       do q = 1, 7
+
+          w_new_L(q, m) = w_hat_L(q, m)
+          w_new_R(q, m) = w_hat_R(q, m+1)
+
+       end do
+    end do
+
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+       do p = 1, 7
+
+          if (lambda(p, m) > 0.0D0) then
+
+             C = 0.0D0
+             A = 0.5D0 * dtdx(m) * (lambda(7, m) - lambda(p, m))
+
+             do q = 1, 7
+                C = C + L(p, q, m) * (A * delta_w(q, m))
+             end do
+
+             do q = 1, 7
+                w_new_L(q, m) = w_new_L(q, m) + C * R(q, p, m)
+             end do
+
+          else if (lambda(p, m+1) < 0.0D0) then
+
+             C = 0.0D0
+             A = 0.5D0 * dtdx(m+1) * (lambda(1, m+1) - lambda(p, m+1))
+
+             do q = 1, 7
+                C = C + L(p, q, m+1) * (A * delta_w(q, m+1))
+             end do
+
+             do q = 1, 7
+                w_new_R(q, m) = w_new_R(q, m) + C * R(q, p, m+1)
+             end do
+
+          end if
+
+       end do
+    end do
+
+
+
+  ! Step eight: the final left and right states.
+  ! --------------------------------------------                              
+
+    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
+
+       density_L(m)    = w_new_L(1, m)
+       x_velocity_L(m) = w_new_L(2, m)
+       y_velocity_L(m) = w_new_L(3, m)
+       z_velocity_L(m) = w_new_L(4, m)
+       x_momentum_L(m) = w_new_L(1, m) * w_new_L(2, m)
+       y_momentum_L(m) = w_new_L(1, m) * w_new_L(3, m)
+       z_momentum_L(m) = w_new_L(1, m) * w_new_L(4, m)
+       gamma_L(m)      = gamma_1D(m)
+
+       x_magfield_L(m) = 0.5D0 * (x_magfield_1D(m) + x_magfield_1D(m+1))
+       y_magfield_L(m) = w_new_L(6, m) * MHDF(-1)
+       z_magfield_L(m) = w_new_L(7, m) * MHDF(-1)
+
+
+       magf = Create_vector (x_magfield_L(m), y_magfield_L(m), z_magfield_L(m))
+       velc = Create_vector (x_velocity_L(m), y_velocity_L(m), z_velocity_L(m))
+
+       magf_squrd = Dotproduct (magf, magf)
+       velc_squrd = Dotproduct (velc, velc)
+
+       pressure_L(m)   = w_new_L(5, m) + (0.5D0 * magf_squrd * MHDF(2))
+       energy_L(m)     = Calculate_energy_EOS (density_L(m), pressure_L(m), gamma_L(m), velc_squrd, magf_squrd)
+
+
+       density_R(m)    = w_new_R(1, m)
+       x_velocity_R(m) = w_new_R(2, m)
+       y_velocity_R(m) = w_new_R(3, m)
+       z_velocity_R(m) = w_new_R(4, m)
+       x_momentum_R(m) = w_new_R(1, m) * w_new_R(2, m)
+       y_momentum_R(m) = w_new_R(1, m) * w_new_R(3, m)
+       z_momentum_R(m) = w_new_R(1, m) * w_new_R(4, m)
+       gamma_R(m)      = gamma_1D(m+1)
+
+       x_magfield_R(m) = x_magfield_L(m)
+       y_magfield_R(m) = w_new_R(6, m) * MHDF(-1)
+       z_magfield_R(m) = w_new_R(7, m) * MHDF(-1)
+
+
+       magf = Create_vector (x_magfield_R(m), y_magfield_R(m), z_magfield_R(m))
+       velc = Create_vector (x_velocity_R(m), y_velocity_R(m), z_velocity_R(m))
+
+       magf_squrd = Dotproduct (magf, magf)
+       velc_squrd = Dotproduct (velc, velc)
+
+       pressure_R(m)   = w_new_R(5, m) + (0.5D0 * magf_squrd * MHDF(2))
+       energy_R(m)     = Calculate_energy_EOS (density_R(m), pressure_R(m), gamma_R(m), velc_squrd, magf_squrd)
+
+    end do
+
+    return
+    
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
+  end subroutine Determine_Riemann_input_PLM
+! ----------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+! ----------------------------------------------------------------------------------------------------------------------------------
+! --- FUNCTION: Determine the Input States for the Riemann Problem (using Piecewise Parabolic Method) ------------------ [REC04] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
   subroutine Determine_Riemann_input_PPM ()
@@ -940,7 +1207,7 @@ contains
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- FUNCTION: Determine the Input States for the Riemann Problem (using Piecewise Parabolic Method: CS Edition) ------ [REC04] ---
+! --- FUNCTION: Determine the Input States for the Riemann Problem (using Piecewise Parabolic Method: CS Edition) ------ [REC05] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
   subroutine Determine_Riemann_input_PPMCS ()
@@ -1268,7 +1535,7 @@ contains
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- FUNCTION: General Minmod Function -------------------------------------------------------------------------------- [REC05] ---
+! --- FUNCTION: General Minmod Function -------------------------------------------------------------------------------- [REC06] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
   function minmod (x, y)
@@ -1297,7 +1564,7 @@ contains
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- SUBROUTINE: Calculate the Eigen-system --------------------------------------------------------------------------- [REC06] ---
+! --- SUBROUTINE: Calculate the Eigen-system --------------------------------------------------------------------------- [REC07] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
   subroutine Calculate_eigensystem ()
@@ -1575,7 +1842,7 @@ contains
 
 
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- SUBROUTINE: Deallocate the Input States -------------------------------------------------------------------------- [REC07] ---
+! --- SUBROUTINE: Deallocate the Input States -------------------------------------------------------------------------- [REC08] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
   subroutine Deallocate_input_states ()
@@ -1639,7 +1906,7 @@ contains
 
     ! Specific for PPM
 
-    if ((RECONSTRUCT_TYPE == 'P') .or. (RECONSTRUCT_TYPE == 'C')) then
+    if ((RECONSTRUCT_TYPE == 'L') .or. (RECONSTRUCT_TYPE == 'P') .or. (RECONSTRUCT_TYPE == 'C')) then
 
        deallocate (wh)
 

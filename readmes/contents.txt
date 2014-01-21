@@ -256,21 +256,25 @@ FUNCTIONS AND SUBROUTINES
 - [REC02]: subroutine Determine_Riemann_input_TVD ()
            Determine the Input States for the Riemann Problem (using Balsara's TVD Scheme)
 
-- [REC03]: subroutine Determine_Riemann_input_PPM ()
+- [REC03]: subroutine Determine_Riemann_input_PLM ()
+  	   Determine the Input States for the Riemann Problem (using Piecewise Linear Method)
+             --> based on Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
+
+- [REC04]: subroutine Determine_Riemann_input_PPM ()
   	   Determine the Input States for the Riemann Problem (using Piecewise Parabolic Method)
              --> based on Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
 
-- [REC04]: subroutine Determine_Riemann_input_PPMCS ()
+- [REC05]: subroutine Determine_Riemann_input_PPMCS ()
            Determine the Input States for the Riemann Problem (using Piecewise Parabolic Method: CS Edition)
              --> based on Colella and Sekora, J. Comput. Phys., 227, 7069 (2008)
 
-- [REC05]: function minmod (x, y)
+- [REC06]: function minmod (x, y)
            General Minmod Function
 
-- [REC06]: subroutine Calculate_eigensystem ()
+- [REC07]: subroutine Calculate_eigensystem ()
            Calculate the Eigen-system
 
-- [REC07]: subroutine Deallocate_input_states ()
+- [REC08]: subroutine Deallocate_input_states ()
            Deallocate the Input States
 
 
