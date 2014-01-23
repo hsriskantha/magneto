@@ -420,7 +420,9 @@ contains
     character :: dens_file*(19)
     character :: pres_file*(19)
     character :: yvel_file*(19)
+    character :: zvel_file*(19)
     character :: ymag_file*(19)
+    character :: zmag_file*(19)
     character :: chari*(4)
 
     real (PREC), dimension(3) :: magf
@@ -439,7 +441,9 @@ contains
     dens_file = "output/dens"//chari//".txt"
     pres_file = "output/pres"//chari//".txt"
     yvel_file = "output/yvel"//chari//".txt"
+    zvel_file = "output/zvel"//chari//".txt"
     ymag_file = "output/ymag"//chari//".txt"
+    zmag_file = "output/zmag"//chari//".txt"
 
 
 
@@ -449,7 +453,9 @@ contains
     open(10, file = dens_file, form = 'formatted')
     open(20, file = pres_file, form = 'formatted')
     open(30, file = yvel_file, form = 'formatted')
-    open(40, file = ymag_file, form = 'formatted')
+    open(40, file = zvel_file, form = 'formatted')
+    open(50, file = ymag_file, form = 'formatted')
+    open(60, file = zmag_file, form = 'formatted')
 
 
 
@@ -470,7 +476,9 @@ contains
           write(10, '(f12.4, a, f12.4)'), pos, ' ', density(m, j, k)
           write(20, '(f12.4, a, f12.4)'), pos, ' ', gas_pressure
           write(30, '(f12.4, a, f12.4)'), pos, ' ', y_velocity(m, j, k)
-          write(40, '(f12.4, a, f12.4)'), pos, ' ', y_magfield(m, j, k)
+          write(40, '(f12.4, a, f12.4)'), pos, ' ', z_velocity(m, j, k)
+          write(50, '(f12.4, a, f12.4)'), pos, ' ', y_magfield(m, j, k)
+          write(60, '(f12.4, a, f12.4)'), pos, ' ', z_magfield(m, j, k)
 
        end do
 
@@ -495,7 +503,9 @@ contains
           write(10, '(f12.4, a, f12.4)'), pos, ' ', density(i, m, k)
           write(20, '(f12.4, a, f12.4)'), pos, ' ', gas_pressure
           write(30, '(f12.4, a, f12.4)'), pos, ' ', y_velocity(i, m, k)
-          write(40, '(f12.4, a, f12.4)'), pos, ' ', y_magfield(i, m, k)
+          write(40, '(f12.4, a, f12.4)'), pos, ' ', z_velocity(i, m, k)
+          write(50, '(f12.4, a, f12.4)'), pos, ' ', y_magfield(i, m, k)
+          write(60, '(f12.4, a, f12.4)'), pos, ' ', z_magfield(i, m, k)
 
        end do
 
@@ -520,7 +530,9 @@ contains
           write(10, '(f12.4, a, f12.4)'), pos, ' ', density(i, j, m)
           write(20, '(f12.4, a, f12.4)'), pos, ' ', gas_pressure
           write(30, '(f12.4, a, f12.4)'), pos, ' ', y_velocity(i, j, m)
-          write(40, '(f12.4, a, f12.4)'), pos, ' ', y_magfield(i, j, m)
+          write(40, '(f12.4, a, f12.4)'), pos, ' ', z_velocity(i, j, m)
+          write(50, '(f12.4, a, f12.4)'), pos, ' ', y_magfield(i, j, m)
+          write(60, '(f12.4, a, f12.4)'), pos, ' ', z_magfield(i, j, m)
 
        end do
 
