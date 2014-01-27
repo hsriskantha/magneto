@@ -993,8 +993,7 @@ contains
   subroutine Determine_Riemann_input_PPM ()
 
     ! This subroutine uses the PPM algorithm of Collela and Woodward, J. Comput. Phys., 54, 174 (1984)
-    !   --> and the montonicity adjustments of Colella and Sekora, J. Comput. Phys., 227, 7069 (2008)
-    !   --> while the characteristic tracing is based on S4.2.3 of Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
+    !   --> based on the version described in S4.2.3 of Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
 
 
   ! Declaration of local variables.
@@ -1138,67 +1137,25 @@ contains
   ! Step seven: further monotonicity constraints.
   ! ---------------------------------------------
 
-    ! From Colella and Sekora, J. Comput. Phys., 227, 7069 (2008)
-
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do q = 1, 7
 
-          cond1 = ((w_R(q, m) - w(q, m)) * (w(q, m) - w_L(q, m)) <= 0.0D0)
-          cond2 = ((w(q, m-1) - w(q, m)) * (w(q, m) - w(q, m+1)) <= 0.0D0)
+          scratch1 = w_R(q, m) - w(q, m)
+          scratch2 = w(q, m) - w_L(q, m)
 
-          if (cond1 .or. cond2) then
-
-             PPM_w6(q, m) = (6.0D0 * w(q, m)) - 3.0D0 * (w_L(q, m) + w_R(q, m))
-
-             daG(q, m) = -2.0D0 * PPM_w6(q, m)
-
-             daC(q, m) = w(q, m-1) - 2.0D0 * w(q, m  ) + w(q, m+1)
-             daL(q, m) = w(q, m-2) - 2.0D0 * w(q, m-1) + w(q, m  )
-             daR(q, m) = w(q, m  ) - 2.0D0 * w(q, m+1) + w(q, m+2)
-
-             cond3 = ((daG(q, m) < 0.0D0) .and. (daC(q, m) < 0.0D0) .and. (daL(q, m) < 0.0D0) .and. (daR(q, m) < 0.0D0))
-             cond4 = ((daG(q, m) > 0.0D0) .and. (daC(q, m) > 0.0D0) .and. (daL(q, m) > 0.0D0) .and. (daR(q, m) > 0.0D0))
-
-             wlim = 0.0D0
-
-             if (cond3 .or. cond4) then
-
-                scratch1 = min(abs(daL(q, m)), abs(daR(q, m)), abs(daC(q, m)))
-
-                wlim = sign(1.0D0, daG(q, m)) * min(Clim * scratch1, abs(daG(q, m)))
-
-             end if
-
-             if (abs(daG(q, m)) < epsilon) then
-
-                w_L(q, m) = w(q, m)
-                w_R(q, m) = w(q, m)
-
-             else
-
-                w_L(q, m) = w(q, m) + (w_L(q, m) - w(q, m)) * (wlim/daG(q, m))
-                w_R(q, m) = w(q, m) + (w_R(q, m) - w(q, m)) * (wlim/daG(q, m))
-                
-             end if
-
-          else
-
-
-             scratch1 = (w_R(q, m) - w_L(q, m))
-             scratch2 = (w_R(q, m) + w_L(q, m)) / 2.0D0
-             
-             if ((6.0D0 * scratch1) * (w(q, m) - scratch2) > scratch1**2.0D0) then
-                
-                w_L(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_R(q, m))
-                
-             else if ((6.0D0 * scratch1) * (w(q, m) - scratch2) < -(scratch1)**2.0D0) then
-                
-                w_R(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_L(q, m))
-                
-             end if
-
+          if ((scratch1 * scratch2) <= 0.0D0) then
+             w_L(q, m) = w(q, m)
+             w_R(q, m) = w(q, m)
           end if
 
+
+          scratch1 = w(q, m) - (0.5D0 * (w_L(q, m) + w_R(q, m)))
+          scratch1 = 6.0D0 * (w_R(q, m) - w_L(q, m)) * scratch1
+
+          scratch2 = (w_R(q, m) - w_L(q, m))**2.0D0
+
+          if (scratch1 >  scratch2) w_L(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_R(q, m))
+          if (scratch1 < -scratch2) w_R(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_L(q, m))
 
        end do
     end do
@@ -1240,8 +1197,6 @@ contains
 
   ! Step ten: the characteristic tracing.
   ! -------------------------------------
-
-    ! From S4.2.3 of Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do q = 1, 7
@@ -1561,13 +1516,6 @@ contains
 
     end do
 
-
-
-  ! Step eight: the characteristic tracing.
-  ! ---------------------------------------
-
-    ! From S4.2.3 of Stone et al., Astrophys. J. Suppl. S., 178, 137 (2008)
-
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
        do q = 1, 7
 
@@ -1578,51 +1526,9 @@ contains
     end do
 
 
-    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-       do p = 1, 7
 
-          if (lambda(p, m) > 0.0D0) then
-
-             C = 0.0D0
-
-             A = 0.5D0 * dtdx(m) * (lambda(7, m) - lambda(p, m))
-             B = (1.0D0/3.0D0) * dtdx(m)**2.0D0 * (lambda(7, m)**2.0D0 - lambda(p, m)**2.0D0)
-
-             do q = 1, 7
-                C = C + L(p, q, m) * (A * (PPM_dw(q, m) - PPM_w6(q, m)) + (B * (PPM_w6(q, m))))
-             end do
-
-             do q = 1, 7
-                w_new_L(q, m) = w_new_L(q, m) + C * R(q, p, m)
-             end do
-
-          end if
-
-
-          if (lambda(p, m) < 0.0D0) then
-
-             C = 0.0D0
-
-             A = 0.5D0 * dtdx(m) * (lambda(1, m) - lambda(p, m))
-             B = (1.0D0/3.0D0) * dtdx(m)**2.0D0 * (lambda(1, m)**2.0D0 - lambda(p, m)**2.0D0)
-
-             do q = 1, 7
-                 C = C + L(p, q, m) * (A * (PPM_dw(q, m) + PPM_w6(q, m)) + (B * (PPM_w6(q, m))))
-             end do
-
-             do q = 1, 7
-               w_new_R(q, m) = w_new_R(q, m) + C * R(q, p, m)
-             end do
-
-          end if
-
-       end do
-    end do   
-
-
-
-  ! Step nine: the final left and right states.
-  ! -------------------------------------------                              
+  ! Step eight: the final left and right states.
+  ! --------------------------------------------                              
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
 
@@ -2083,7 +1989,6 @@ contains
        
           deallocate (PPM_dw)   
           deallocate (PPM_w6)
-          deallocate (sigma)
 
        end if
 
