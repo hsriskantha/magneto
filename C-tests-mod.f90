@@ -89,7 +89,7 @@ contains
   ! ---------------
 
     DELTAT   = 0.0001D0
-    FULLTIME = 0.16D0
+    FULLTIME = 0.08D0
 
     COURANT    = 0.25D0
     MAX_DELTAT = 0.01D0
@@ -240,7 +240,7 @@ contains
   ! ---------------
 
     DELTAT   = 0.0001D0
-    FULLTIME = 0.16D0
+    FULLTIME = 0.2D0
 
     COURANT    = 0.25D0
     MAX_DELTAT = 0.01D0
@@ -290,9 +290,9 @@ contains
 
        gamma(i, 1, 1) = 5.0D0 / 3.0D0
 
-       x_magfield(i, 1, 1) = 0.5641895835477562D0 
-       y_magfield(i, 1, 1) = 1.0155412503859613D0 
-       z_magfield(i, 1, 1) = 0.5641895835477562D0 
+       x_magfield(i, 1, 1) = 2.0D0 / sqrt(4.0D0 * PI)
+       y_magfield(i, 1, 1) = 3.6D0 / sqrt(4.0D0 * PI)
+       z_magfield(i, 1, 1) = 2.0D0 * sqrt(4.0D0 * PI)
 
 
        ! Note: these values are set automatically.
@@ -326,9 +326,9 @@ contains
 
        gamma(i, 1, 1) = 5.0D0 / 3.0D0
 
-       x_magfield(i, 1, 1) = 0.5641895835477562D0
-       y_magfield(i, 1, 1) = 1.1283791670955125D0
-       z_magfield(i, 1, 1) = 0.5641895835477562D0 
+       x_magfield(i, 1, 1) = 2.0D0 / sqrt(4.0D0 * PI)
+       y_magfield(i, 1, 1) = 4.0D0 / sqrt(4.0D0 * PI)
+       z_magfield(i, 1, 1) = 2.0D0 * sqrt(4.0D0 * PI)
 
 
        ! Note: these values are set automatically.
@@ -370,7 +370,7 @@ contains
 ! ----------------------------------------------------------------------------------------------------------------------------------
 ! --- SUBROUTINE: Set Initial Conditions of Fluid ---------------------------------------------------------------------- [TES03] ---
 ! ----------------------------------------------------------------------------------------------------------------------------------
-! --- Version A: Ryu and Jones' Shock Tube Test (4D) -------------------------------------------------------------------------------
+! --- Version C: Ryu and Jones' Shock Tube Test (4D) -------------------------------------------------------------------------------
 ! ----------------------------------------------------------------------------------------------------------------------------------
 
   subroutine Set_initial_conditions_C ()
