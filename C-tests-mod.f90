@@ -292,7 +292,7 @@ contains
 
        x_magfield(i, 1, 1) = 2.0D0 / sqrt(4.0D0 * PI)
        y_magfield(i, 1, 1) = 3.6D0 / sqrt(4.0D0 * PI)
-       z_magfield(i, 1, 1) = 2.0D0 * sqrt(4.0D0 * PI)
+       z_magfield(i, 1, 1) = 2.0D0 / sqrt(4.0D0 * PI)
 
 
        ! Note: these values are set automatically.
@@ -328,7 +328,7 @@ contains
 
        x_magfield(i, 1, 1) = 2.0D0 / sqrt(4.0D0 * PI)
        y_magfield(i, 1, 1) = 4.0D0 / sqrt(4.0D0 * PI)
-       z_magfield(i, 1, 1) = 2.0D0 * sqrt(4.0D0 * PI)
+       z_magfield(i, 1, 1) = 2.0D0 / sqrt(4.0D0 * PI)
 
 
        ! Note: these values are set automatically.
