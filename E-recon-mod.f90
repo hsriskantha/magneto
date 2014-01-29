@@ -1226,19 +1226,19 @@ contains
                 w_new_L(q, m) = w_new_L(q, m) + C * R(q, p, m)
              end do
 
-          else if (lambda(p, m) < 0.0D0) then
+          else if (lambda(p, m+1) < 0.0D0) then
 
              C = 0.0D0
 
-             A = 0.5D0 * dtdx(m) * (lambda(1, m) - lambda(p, m))
-             B = (1.0D0/3.0D0) * dtdx(m)**2.0D0 * (lambda(1, m)**2.0D0 - lambda(p, m)**2.0D0)
+             A = 0.5D0 * dtdx(m+1) * (lambda(1, m+1) - lambda(p, m+1))
+             B = (1.0D0/3.0D0) * dtdx(m+1)**2.0D0 * (lambda(1, m+1)**2.0D0 - lambda(p, m+1)**2.0D0)
 
              do q = 1, 7
-                 C = C + L(p, q, m) * (A * (PPM_dw(q, m) + PPM_w6(q, m)) + (B * (PPM_w6(q, m))))
+                 C = C + L(p, q, m+1) * (A * (PPM_dw(q, m+1) + PPM_w6(q, m+1)) + (B * (PPM_w6(q, m+1))))
              end do
 
              do q = 1, 7
-               w_new_R(q, m) = w_new_R(q, m) + C * R(q, p, m)
+               w_new_R(q, m) = w_new_R(q, m) + C * R(q, p, m+1)
              end do
 
           end if
