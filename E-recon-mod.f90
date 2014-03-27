@@ -1226,19 +1226,19 @@ contains
                 w_new_L(q, m) = w_new_L(q, m) + C * R(q, p, m)
              end do
 
-          else if (lambda(p, m+1) < 0.0D0) then
+          else if (lambda(p, m) < 0.0D0) then
 
              C = 0.0D0
 
-             A = 0.5D0 * dtdx(m+1) * (lambda(1, m+1) - lambda(p, m+1))
-             B = (1.0D0/3.0D0) * dtdx(m+1)**2.0D0 * (lambda(1, m+1)**2.0D0 - lambda(p, m+1)**2.0D0)
+             A = 0.5D0 * dtdx(m) * (lambda(1, m) - lambda(p, m))
+             B = (1.0D0/3.0D0) * dtdx(m)**2.0D0 * (lambda(1, m)**2.0D0 - lambda(p, m)**2.0D0)
 
              do q = 1, 7
-                 C = C + L(p, q, m+1) * (A * (PPM_dw(q, m+1) + PPM_w6(q, m+1)) + (B * (PPM_w6(q, m+1))))
+                 C = C + L(p, q, m) * (A * (PPM_dw(q, m) + PPM_w6(q, m)) + (B * (PPM_w6(q, m))))
              end do
 
              do q = 1, 7
-               w_new_R(q, m) = w_new_R(q, m) + C * R(q, p, m+1)
+               w_new_R(q, m) = w_new_R(q, m) + C * R(q, p, m)
              end do
 
           end if
@@ -1332,16 +1332,15 @@ contains
 
     logical :: cond1, cond2, cond3, cond4
 
-    real (PREC) :: A, B, C, s
-    real (PREC) :: scratch1, scratch2
-    real (PREC) :: scratch3, scratch4
-    real (PREC) :: scratch5, wlim
+    real (PREC) :: A, B, C
+    real (PREC) :: scratch1, scratch2, wlim
 
     integer :: m     ! m is used to label spatial position (i.e. m in [1, MFULL])
     integer :: p     ! p and q are used to label elements of state-based vectors (i.e. with 7 elements).  
     integer :: q     !   Usually, p labels eigenvalues (e.g. p = 1 corresponds to v_x - c_f).
 
-    real (PREC), parameter :: Clim = 2.5D0
+    real (PREC), parameter :: epsilon = 1D-10
+    real (PREC), parameter :: Clim = 1.25D0
 
 
 
@@ -1383,31 +1382,21 @@ contains
     
     do m = BOUNDARY,  (BOUNDARY + rowsize) + 1
        do q = 1, 7
-
-          scratch1 = min(w(q, m), w(q, m+1))
-          scratch2 = max(w(q, m), w(q, m+1))
-
-          if ((wh(q, m) < scratch1) .or. (wh(q, m) > scratch2)) then
           
-             daG(q, m) = 0.0D0
+          daG(q, m) = 0.0D0
+          
+          cond1 = ((daC(q, m) > 0.0D0) .and. (daL(q, m) > 0.0D0) .and. (daR(q, m) > 0.0D0))
+          cond2 = ((daC(q, m) < 0.0D0) .and. (daL(q, m) < 0.0D0) .and. (daR(q, m) < 0.0D0))
+          
+          if (cond1 .or. cond2) then
              
-             cond1 = ((daC(q, m) > 0.0D0) .and. (daL(q, m) > 0.0D0) .and. (daR(q, m) > 0.0D0))
-             cond2 = ((daC(q, m) < 0.0D0) .and. (daL(q, m) < 0.0D0) .and. (daR(q, m) < 0.0D0))
+             scratch1 = min(abs(daL(q, m)), abs(daR(q, m)))
              
-             if (cond1 .or. cond2) then
-
-                scratch3 = Clim * abs(daL(q, m))
-                scratch4 = Clim * abs(daR(q, m))
-
-                s = sign(1.0D0, daC(q, m))
-
-                daG(q, m) = s * min(scratch3, scratch4, abs(daC(q, m)))
-                
-             end if
+             daG(q, m) = sign(1.0D0, daC(q, m)) * min(Clim * scratch1, abs(daC(q, m)))
              
-             wh(q, m) = (0.5D0 * (w(q, m) + w(q, m+1))) - (daG(q, m)/3.0D0)
-
           end if
+          
+          wh(q, m) = (0.5D0 * (w(q, m) + w(q, m+1))) + (daG(q, m)/3.0D0)
 
        end do
     end do
@@ -1437,7 +1426,7 @@ contains
           cond1 = ((w_R(q, m) - w(q, m)) * (w(q, m) - w_L(q, m)) <= 0.0D0)
           cond2 = ((w(q, m-1) - w(q, m)) * (w(q, m) - w(q, m+1)) <= 0.0D0)
 
-          if (cond1 .and. cond2) then
+          if (cond1 .or. cond2) then
 
              PPM_w6(q, m) = (6.0D0 * w(q, m)) - 3.0D0 * (w_L(q, m) + w_R(q, m))
 
@@ -1454,17 +1443,13 @@ contains
 
              if (cond3 .or. cond4) then
 
-                scratch3 = Clim * abs(daL(q, m))
-                scratch4 = Clim * abs(daR(q, m))
-                scratch5 = Clim * abs(daC(q, m))
+                scratch1 = min(abs(daL(q, m)), abs(daR(q, m)), abs(daC(q, m)))
 
-                s = sign(1.0D0, daG(q, m))
-
-                wlim = s * min(scratch3, scratch4, scratch5, abs(daG(q, m)))
+                wlim = sign(1.0D0, daG(q, m)) * min(Clim * scratch1, abs(daG(q, m)))
 
              end if
 
-             if (abs(daG(q, m)) == 0.0D0) then
+             if (abs(daG(q, m)) < epsilon) then
 
                 w_L(q, m) = w(q, m)
                 w_R(q, m) = w(q, m)
@@ -1478,27 +1463,23 @@ contains
 
           else
 
-             scratch1 = abs(w_R(q, m) - w(q, m))
-             scratch2 = abs(w_L(q, m) - w(q, m))
 
-             if (scratch1 >= 2.0D0 * scratch2) w_R(q, m) = w(q, m) - 2.0D0 * (w_L(q, m) - w(q, m))
-             if (scratch2 >= 2.0D0 * scratch1) w_L(q, m) = w(q, m) - 2.0D0 * (w_R(q, m) - w(q, m))
+             scratch1 = (w_R(q, m) - w_L(q, m))
+             scratch2 = (w_R(q, m) + w_L(q, m)) / 2.0D0
+             
+             if ((6.0D0 * scratch1) * (w(q, m) - scratch2) > scratch1**2.0D0) then
+                
+                w_L(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_R(q, m))
+                
+             else if ((6.0D0 * scratch1) * (w(q, m) - scratch2) < -(scratch1)**2.0D0) then
+                
+                w_R(q, m) = (3.0D0 * w(q, m)) - (2.0D0 * w_L(q, m))
+                
+             end if
 
           end if
 
 
-       end do
-    end do
-
-
-    do m = BOUNDARY, (BOUNDARY + rowsize) + 1
-       do q = 1, 7
-
-          w_L(q, m) = max(min(w(q, m), w(q, m-1)), w_L(q, m))
-          w_L(q, m) = min(max(w(q, m), w(q, m-1)), w_L(q, m))
-          w_R(q, m) = max(min(w(q, m), w(q, m+1)), w_R(q, m))
-          w_R(q, m) = min(max(w(q, m), w(q, m+1)), w_R(q, m))
-          
        end do
     end do
 
@@ -1523,8 +1504,8 @@ contains
 
     do m = BOUNDARY, (BOUNDARY + rowsize) + 1
 
-        scratch1 = abs(max(lambda(7, m), 0.0D0) * dtdx(m))
-        scratch2 = abs(min(lambda(1, m), 0.0D0) * dtdx(m))
+        scratch1 =  max(lambda(7, m), 0.0D0) * dtdx(m)
+        scratch2 = -min(lambda(1, m), 0.0D0) * dtdx(m)
 
         do q = 1, 7
 
